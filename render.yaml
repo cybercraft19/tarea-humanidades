@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: escape-room-ws
+    runtime: node
+    plan: free
+    rootDir: .
+    buildCommand: npm install
+    startCommand: npm run server:start
+    healthCheckPath: /
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+
+  - type: web
+    name: escape-room-web
+    runtime: static
+    rootDir: artifacts/escape-room
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist/public
+    envVars:
+      - key: VITE_LIVE_ROOM_WS_URL
+        sync: false

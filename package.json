@@ -1,0 +1,21 @@
+{
+  "name": "escape-room-root",
+  "private": true,
+  "dependencies": {
+    "ws": "^8.18.3"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  },
+  "scripts": {
+    "dev:client": "npm --prefix artifacts/escape-room run dev",
+    "dev:server": "node server/live-room-server.mjs",
+    "server:start": "node server/live-room-server.mjs",
+    "install:app": "npm --prefix artifacts/escape-room install",
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "build": "npm --prefix artifacts/escape-room run build",
+    "serve": "npm --prefix artifacts/escape-room run serve",
+    "typecheck": "npm --prefix artifacts/escape-room run typecheck",
+    "postinstall": "npm --prefix artifacts/escape-room install"
+  }
+}

@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "Escape Room: La Biblioteca del Tiempo"
+version = "1.0.0"
+id = "artifacts/escape-room"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 18713
+
+[services.development]
+run = "pnpm --filter @workspace/escape-room run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/escape-room", "run", "build" ]
+publicDir = "artifacts/escape-room/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "18713"
+BASE_PATH = "/"

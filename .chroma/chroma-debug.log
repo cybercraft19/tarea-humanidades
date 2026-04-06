@@ -1,0 +1,141 @@
+[2026-04-06T20:56:28.706Z] === Chroma Debug Log Started ===
+[2026-04-06T20:56:28.706Z] Timestamp: 2026-04-06T20:56:28.706Z
+[2026-04-06T20:56:28.706Z] Log file: c:\Users\nadie\Desktop\escape-room\.chroma\chroma-debug.log
+[2026-04-06T20:56:28.706Z] 
+[2026-04-06T20:56:28.706Z] === Extension Activated ===
+[2026-04-06T20:56:28.706Z] Workspace root: c:\Users\nadie\Desktop\escape-room
+[2026-04-06T20:56:28.706Z] Configured database path: .chroma/chroma.db
+[2026-04-06T20:56:28.706Z] Log directory: c:\Users\nadie\Desktop\escape-room\.chroma
+[2026-04-06T20:56:28.706Z] [INFO] Database path set to: [".chroma/chroma.db"]
+[2026-04-06T20:56:28.707Z] Database path set to: .chroma/chroma.db
+[2026-04-06T20:56:28.707Z] Initializing database with workspace root
+[2026-04-06T20:56:28.709Z] [INFO] initDatabase called [{"memory":false,"workspaceRoot":"c:\\Users\\nadie\\Desktop\\escape-room","caller":"at Generator.next (<anonymous>)"}]
+[2026-04-06T20:56:28.731Z] [INFO] Database path resolved to: ["c:\\Users\\nadie\\Desktop\\escape-room\\.chroma\\chroma.db"]
+[2026-04-06T20:56:28.731Z] [INFO] Database file exists: [false]
+[2026-04-06T20:56:28.731Z] [INFO] __dirname is: ["c:\\Users\\nadie\\.vscode\\extensions\\lilfetz22.chroma-workspace-2.23.0\\dist"]
+[2026-04-06T20:56:28.737Z] [INFO] Database initialized from file
+[2026-04-06T20:56:28.737Z] [INFO] Running database migrations
+[2026-04-06T20:56:28.752Z] [database.prepare.run] SQL: INSERT INTO schema_migrations (version, name) VALUES (?, ?)
+[2026-04-06T20:56:28.752Z] [database.prepare.run] Params: [1,"initial_schema"]
+[2026-04-06T20:56:28.753Z] [saveDatabase] Called. db: true dbFilePath: c:\Users\nadie\Desktop\escape-room\.chroma\chroma.db memoryDb: undefined
+[2026-04-06T20:56:28.754Z] [saveDatabase] Exporting database...
+[2026-04-06T20:56:28.754Z] [saveDatabase] Export complete. Data length: 20480 bytes
+[2026-04-06T20:56:28.755Z] [saveDatabase] Writing to: c:\Users\nadie\Desktop\escape-room\.chroma\chroma.db
+[2026-04-06T20:56:28.756Z] [saveDatabase] writeFileSync completed
+[2026-04-06T20:56:28.756Z] [saveDatabase] File mtime after write: 1775508988756.6604
+[2026-04-06T20:56:28.756Z] [saveDatabase] Database saved successfully to: c:\Users\nadie\Desktop\escape-room\.chroma\chroma.db
+[2026-04-06T20:56:28.759Z] [database.prepare.run] SQL: INSERT INTO schema_migrations (version, name) VALUES (?, ?)
+[2026-04-06T20:56:28.759Z] [database.prepare.run] Params: [2,"add_kanban_tables"]
+[2026-04-06T20:56:28.759Z] [saveDatabase] Called. db: true dbFilePath: c:\Users\nadie\Desktop\escape-room\.chroma\chroma.db memoryDb: undefined
+[2026-04-06T20:56:28.760Z] [saveDatabase] Exporting database...
+[2026-04-06T20:56:28.760Z] [saveDatabase] Export complete. Data length: 45056 bytes
+[2026-04-06T20:56:28.760Z] [saveDatabase] Writing to: c:\Users\nadie\Desktop\escape-room\.chroma\chroma.db
+[2026-04-06T20:56:28.761Z] [saveDatabase] writeFileSync completed
+[2026-04-06T20:56:28.761Z] [saveDatabase] File mtime after write: 1775508988761.812
+[2026-04-06T20:56:28.761Z] [saveDatabase] Database saved successfully to: c:\Users\nadie\Desktop\escape-room\.chroma\chroma.db
+[2026-04-06T20:56:28.763Z] [database.prepare.run] SQL: INSERT INTO schema_migrations (version, name) VALUES (?, ?)
+[2026-04-06T20:56:28.763Z] [database.prepare.run] Params: [3,"add_tasks_table"]
+[2026-04-06T20:56:28.764Z] [saveDatabase] Called. db: true dbFilePath: c:\Users\nadie\Desktop\escape-room\.chroma\chroma.db memoryDb: undefined
+[2026-04-06T20:56:28.764Z] [saveDatabase] Exporting database...
+[2026-04-06T20:56:28.765Z] [saveDatabase] Export complete. Data length: 61440 bytes
+[2026-04-06T20:56:28.765Z] [saveDatabase] Writing to: c:\Users\nadie\Desktop\escape-room\.chroma\chroma.db
+[2026-04-06T20:56:28.765Z] [saveDatabase] writeFileSync completed
+[2026-04-06T20:56:28.766Z] [saveDatabase] File mtime after write: 1775508988766.5205
+[2026-04-06T20:56:28.766Z] [saveDatabase] Database saved successfully to: c:\Users\nadie\Desktop\escape-room\.chroma\chroma.db
+[2026-04-06T20:56:28.767Z] [database.prepare.run] SQL: INSERT INTO schema_migrations (version, name) VALUES (?, ?)
+[2026-04-06T20:56:28.768Z] [database.prepare.run] Params: [4,"add_tagging_system"]
+[2026-04-06T20:56:28.768Z] [saveDatabase] Called. db: true dbFilePath: c:\Users\nadie\Desktop\escape-room\.chroma\chroma.db memoryDb: undefined
+[2026-04-06T20:56:28.768Z] [saveDatabase] Exporting database...
+[2026-04-06T20:56:28.769Z] [saveDatabase] Export complete. Data length: 81920 bytes
+[2026-04-06T20:56:28.769Z] [saveDatabase] Writing to: c:\Users\nadie\Desktop\escape-room\.chroma\chroma.db
+[2026-04-06T20:56:28.769Z] [saveDatabase] writeFileSync completed
+[2026-04-06T20:56:28.770Z] [saveDatabase] File mtime after write: 1775508988767.8596
+[2026-04-06T20:56:28.770Z] [saveDatabase] Database saved successfully to: c:\Users\nadie\Desktop\escape-room\.chroma\chroma.db
+[2026-04-06T20:56:28.774Z] [database.prepare.run] SQL: INSERT INTO schema_migrations (version, name) VALUES (?, ?)
+[2026-04-06T20:56:28.774Z] [database.prepare.run] Params: [5,"add_full_text_search"]
+[2026-04-06T20:56:28.774Z] [saveDatabase] Called. db: true dbFilePath: c:\Users\nadie\Desktop\escape-room\.chroma\chroma.db memoryDb: undefined
+[2026-04-06T20:56:28.774Z] [saveDatabase] Exporting database...
+[2026-04-06T20:56:28.775Z] [saveDatabase] Export complete. Data length: 110592 bytes
+[2026-04-06T20:56:28.775Z] [saveDatabase] Writing to: c:\Users\nadie\Desktop\escape-room\.chroma\chroma.db
+[2026-04-06T20:56:28.776Z] [saveDatabase] writeFileSync completed
+[2026-04-06T20:56:28.777Z] [saveDatabase] File mtime after write: 1775508988767.8596
+[2026-04-06T20:56:28.777Z] [saveDatabase] Database saved successfully to: c:\Users\nadie\Desktop\escape-room\.chroma\chroma.db
+[2026-04-06T20:56:28.779Z] [database.prepare.run] SQL: INSERT INTO schema_migrations (version, name) VALUES (?, ?)
+[2026-04-06T20:56:28.779Z] [database.prepare.run] Params: [6,"add_task_tags_table"]
+[2026-04-06T20:56:28.779Z] [saveDatabase] Called. db: true dbFilePath: c:\Users\nadie\Desktop\escape-room\.chroma\chroma.db memoryDb: undefined
+[2026-04-06T20:56:28.779Z] [saveDatabase] Exporting database...
+[2026-04-06T20:56:28.780Z] [saveDatabase] Export complete. Data length: 122880 bytes
+[2026-04-06T20:56:28.780Z] [saveDatabase] Writing to: c:\Users\nadie\Desktop\escape-room\.chroma\chroma.db
+[2026-04-06T20:56:28.781Z] [saveDatabase] writeFileSync completed
+[2026-04-06T20:56:28.781Z] [saveDatabase] File mtime after write: 1775508988782.212
+[2026-04-06T20:56:28.781Z] [saveDatabase] Database saved successfully to: c:\Users\nadie\Desktop\escape-room\.chroma\chroma.db
+[2026-04-06T20:56:28.784Z] [database.prepare.run] SQL: INSERT INTO schema_migrations (version, name) VALUES (?, ?)
+[2026-04-06T20:56:28.784Z] [database.prepare.run] Params: [7,"add_completed_at_to_cards"]
+[2026-04-06T20:56:28.784Z] [saveDatabase] Called. db: true dbFilePath: c:\Users\nadie\Desktop\escape-room\.chroma\chroma.db memoryDb: undefined
+[2026-04-06T20:56:28.785Z] [saveDatabase] Exporting database...
+[2026-04-06T20:56:28.785Z] [saveDatabase] Export complete. Data length: 126976 bytes
+[2026-04-06T20:56:28.785Z] [saveDatabase] Writing to: c:\Users\nadie\Desktop\escape-room\.chroma\chroma.db
+[2026-04-06T20:56:28.786Z] [saveDatabase] writeFileSync completed
+[2026-04-06T20:56:28.786Z] [saveDatabase] File mtime after write: 1775508988785.4243
+[2026-04-06T20:56:28.786Z] [saveDatabase] Database saved successfully to: c:\Users\nadie\Desktop\escape-room\.chroma\chroma.db
+[2026-04-06T20:56:28.804Z] [database.prepare.run] SQL: INSERT INTO schema_migrations (version, name) VALUES (?, ?)
+[2026-04-06T20:56:28.804Z] [database.prepare.run] Params: [8,"align_schema_with_documentation"]
+[2026-04-06T20:56:28.804Z] [saveDatabase] Called. db: true dbFilePath: c:\Users\nadie\Desktop\escape-room\.chroma\chroma.db memoryDb: undefined
+[2026-04-06T20:56:28.805Z] [saveDatabase] Exporting database...
+[2026-04-06T20:56:28.805Z] [saveDatabase] Export complete. Data length: 151552 bytes
+[2026-04-06T20:56:28.805Z] [saveDatabase] Writing to: c:\Users\nadie\Desktop\escape-room\.chroma\chroma.db
+[2026-04-06T20:56:28.809Z] [saveDatabase] writeFileSync completed
+[2026-04-06T20:56:28.810Z] [saveDatabase] File mtime after write: 1775508988810.462
+[2026-04-06T20:56:28.810Z] [saveDatabase] Database saved successfully to: c:\Users\nadie\Desktop\escape-room\.chroma\chroma.db
+[2026-04-06T20:56:28.811Z] [database.prepare.run] SQL: INSERT INTO schema_migrations (version, name) VALUES (?, ?)
+[2026-04-06T20:56:28.811Z] [database.prepare.run] Params: [9,"fix_cards_updated_at_column"]
+[2026-04-06T20:56:28.811Z] [saveDatabase] Called. db: true dbFilePath: c:\Users\nadie\Desktop\escape-room\.chroma\chroma.db memoryDb: undefined
+[2026-04-06T20:56:28.811Z] [saveDatabase] Exporting database...
+[2026-04-06T20:56:28.812Z] [saveDatabase] Export complete. Data length: 151552 bytes
+[2026-04-06T20:56:28.812Z] [saveDatabase] Writing to: c:\Users\nadie\Desktop\escape-room\.chroma\chroma.db
+[2026-04-06T20:56:28.812Z] [saveDatabase] writeFileSync completed
+[2026-04-06T20:56:28.813Z] [saveDatabase] File mtime after write: 1775508988810.462
+[2026-04-06T20:56:28.813Z] [saveDatabase] Database saved successfully to: c:\Users\nadie\Desktop\escape-room\.chroma\chroma.db
+[2026-04-06T20:56:28.814Z] [database.prepare.run] SQL: INSERT INTO schema_migrations (version, name) VALUES (?, ?)
+[2026-04-06T20:56:28.814Z] [database.prepare.run] Params: [10,"add_converted_from_task_at_column"]
+[2026-04-06T20:56:28.814Z] [saveDatabase] Called. db: true dbFilePath: c:\Users\nadie\Desktop\escape-room\.chroma\chroma.db memoryDb: undefined
+[2026-04-06T20:56:28.814Z] [saveDatabase] Exporting database...
+[2026-04-06T20:56:28.815Z] [saveDatabase] Export complete. Data length: 151552 bytes
+[2026-04-06T20:56:28.815Z] [saveDatabase] Writing to: c:\Users\nadie\Desktop\escape-room\.chroma\chroma.db
+[2026-04-06T20:56:28.816Z] [saveDatabase] writeFileSync completed
+[2026-04-06T20:56:28.816Z] [saveDatabase] File mtime after write: 1775508988816.9707
+[2026-04-06T20:56:28.816Z] [saveDatabase] Database saved successfully to: c:\Users\nadie\Desktop\escape-room\.chroma\chroma.db
+[2026-04-06T20:56:28.817Z] [database.prepare.run] SQL: INSERT INTO schema_migrations (version, name) VALUES (?, ?)
+[2026-04-06T20:56:28.817Z] [database.prepare.run] Params: [11,"add_board_id_to_tasks"]
+[2026-04-06T20:56:28.818Z] [saveDatabase] Called. db: true dbFilePath: c:\Users\nadie\Desktop\escape-room\.chroma\chroma.db memoryDb: undefined
+[2026-04-06T20:56:28.818Z] [saveDatabase] Exporting database...
+[2026-04-06T20:56:28.818Z] [saveDatabase] Export complete. Data length: 151552 bytes
+[2026-04-06T20:56:28.818Z] [saveDatabase] Writing to: c:\Users\nadie\Desktop\escape-room\.chroma\chroma.db
+[2026-04-06T20:56:28.819Z] [saveDatabase] writeFileSync completed
+[2026-04-06T20:56:28.819Z] [saveDatabase] File mtime after write: 1775508988819.9792
+[2026-04-06T20:56:28.819Z] [saveDatabase] Database saved successfully to: c:\Users\nadie\Desktop\escape-room\.chroma\chroma.db
+[2026-04-06T20:56:28.819Z] [database.prepare.run] SQL: INSERT INTO schema_migrations (version, name) VALUES (?, ?)
+[2026-04-06T20:56:28.819Z] [database.prepare.run] Params: [12,"assign_sequential_positions_to_existing_cards"]
+[2026-04-06T20:56:28.820Z] [saveDatabase] Called. db: true dbFilePath: c:\Users\nadie\Desktop\escape-room\.chroma\chroma.db memoryDb: undefined
+[2026-04-06T20:56:28.820Z] [saveDatabase] Exporting database...
+[2026-04-06T20:56:28.820Z] [saveDatabase] Export complete. Data length: 151552 bytes
+[2026-04-06T20:56:28.820Z] [saveDatabase] Writing to: c:\Users\nadie\Desktop\escape-room\.chroma\chroma.db
+[2026-04-06T20:56:28.821Z] [saveDatabase] writeFileSync completed
+[2026-04-06T20:56:28.821Z] [saveDatabase] File mtime after write: 1775508988821.9795
+[2026-04-06T20:56:28.821Z] [saveDatabase] Database saved successfully to: c:\Users\nadie\Desktop\escape-room\.chroma\chroma.db
+[2026-04-06T20:56:28.823Z] [database.prepare.run] SQL: INSERT INTO schema_migrations (version, name) VALUES (?, ?)
+[2026-04-06T20:56:28.823Z] [database.prepare.run] Params: [13,"add_hidden_column_to_columns"]
+[2026-04-06T20:56:28.823Z] [saveDatabase] Called. db: true dbFilePath: c:\Users\nadie\Desktop\escape-room\.chroma\chroma.db memoryDb: undefined
+[2026-04-06T20:56:28.823Z] [saveDatabase] Exporting database...
+[2026-04-06T20:56:28.824Z] [saveDatabase] Export complete. Data length: 151552 bytes
+[2026-04-06T20:56:28.824Z] [saveDatabase] Writing to: c:\Users\nadie\Desktop\escape-room\.chroma\chroma.db
+[2026-04-06T20:56:28.825Z] [saveDatabase] writeFileSync completed
+[2026-04-06T20:56:28.825Z] [saveDatabase] File mtime after write: 1775508988825.8513
+[2026-04-06T20:56:28.825Z] [saveDatabase] Database saved successfully to: c:\Users\nadie\Desktop\escape-room\.chroma\chroma.db
+[2026-04-06T20:56:28.827Z] [INFO] search_index is already a regular table, no conversion needed
+[2026-04-06T20:56:28.827Z] [INFO] Database initialized successfully
+[2026-04-06T20:56:28.827Z] Database initialized successfully
+[2026-04-06T20:56:28.827Z] Running card position normalization
+[2026-04-06T20:56:28.828Z] [INFO] Starting card position normalization across all boards
+[2026-04-06T20:56:28.828Z] Card position normalization complete
+[2026-04-06T20:56:28.836Z] Git Sync: Startup pull skipped (sync disabled)
