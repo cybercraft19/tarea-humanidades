@@ -353,7 +353,7 @@ export default function LobbyScreen() {
                     setProfileName(e.target.value);
                     setError("");
                   }}
-                  placeholder="Ej: NadiaPro"
+                  placeholder="Ej: MairaYohanaPro777"
                   className="w-full rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm text-white placeholder-slate-400"
                 />
               </div>
