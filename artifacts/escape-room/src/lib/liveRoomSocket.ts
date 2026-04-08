@@ -1,4 +1,4 @@
-import type { LivePlayer, RankingEntry } from "@/lib/liveRoom";
+import type { LiveChatMessage, LivePlayer, RankingEntry } from "@/lib/liveRoom";
 
 type RoomSnapshotMessage = {
   type: "snapshot";
@@ -12,15 +12,33 @@ type RankingMessage = {
   ranking: RankingEntry[];
 };
 
+type ChatHistoryMessage = {
+  type: "chat-history";
+  messages: LiveChatMessage[];
+};
+
+type ChatMessage = {
+  type: "chat";
+  message: LiveChatMessage;
+};
+
+type SessionStartMessage = {
+  type: "session-start";
+  startAt: number;
+  initiatedBy: string;
+};
+
 type ErrorMessage = {
   type: "error";
   message: string;
 };
 
-type IncomingMessage = RoomSnapshotMessage | RankingMessage | ErrorMessage | { type: string };
+type IncomingMessage = RoomSnapshotMessage | RankingMessage | ChatHistoryMessage | ChatMessage | SessionStartMessage | ErrorMessage;
 
 type PresenceListener = (players: LivePlayer[]) => void;
 type RankingListener = (ranking: RankingEntry[]) => void;
+type SessionStartListener = (payload: { startAt: number; initiatedBy: string }) => void;
+type ChatListener = (messages: LiveChatMessage[]) => void;
 
 class LiveRoomSocketClient {
   private socket: WebSocket | null = null;
@@ -31,6 +49,9 @@ class LiveRoomSocketClient {
   private latestPresence: Omit<LivePlayer, "lastSeen"> | null = null;
   private players: LivePlayer[] = [];
   private ranking: RankingEntry[] = [];
+  private chatMessages: LiveChatMessage[] = [];
+  private sessionStartListeners = new Set<SessionStartListener>();
+  private chatListeners = new Set<ChatListener>();
   private presenceListeners = new Set<PresenceListener>();
   private rankingListeners = new Set<RankingListener>();
 
@@ -122,16 +143,45 @@ class LiveRoomSocketClient {
     this.send({ type: "ranking", entry });
   }
 
+  sendChat(text: string) {
+    const trimmed = text.trim();
+    if (!trimmed) return;
+    this.send({ type: "chat", text: trimmed.slice(0, 280) });
+  }
+
+  requestSessionStart(startAt: number) {
+    this.send({ type: "start-session", startAt });
+  }
+
   subscribePresence(listener: PresenceListener) {
     this.presenceListeners.add(listener);
     listener(this.players);
-    return () => this.presenceListeners.delete(listener);
+    return () => {
+      this.presenceListeners.delete(listener);
+    };
   }
 
   subscribeRanking(listener: RankingListener) {
     this.rankingListeners.add(listener);
     listener(this.ranking);
-    return () => this.rankingListeners.delete(listener);
+    return () => {
+      this.rankingListeners.delete(listener);
+    };
+  }
+
+  subscribeSessionStart(listener: SessionStartListener) {
+    this.sessionStartListeners.add(listener);
+    return () => {
+      this.sessionStartListeners.delete(listener);
+    };
+  }
+
+  subscribeChat(listener: ChatListener) {
+    this.chatListeners.add(listener);
+    listener(this.chatMessages);
+    return () => {
+      this.chatListeners.delete(listener);
+    };
   }
 
   getPlayers() {
@@ -140,6 +190,10 @@ class LiveRoomSocketClient {
 
   getRanking() {
     return this.ranking;
+  }
+
+  getChatMessages() {
+    return this.chatMessages;
   }
 
   private notifyPlayers() {
@@ -154,30 +208,65 @@ class LiveRoomSocketClient {
     }
   }
 
+  private notifySessionStart(payload: { startAt: number; initiatedBy: string }) {
+    for (const listener of this.sessionStartListeners) {
+      listener(payload);
+    }
+  }
+
+  private notifyChat() {
+    for (const listener of this.chatListeners) {
+      listener(this.chatMessages);
+    }
+  }
+
   private handleMessage(raw: unknown) {
-    let parsed: IncomingMessage;
+    let parsed: unknown;
     try {
-      parsed = JSON.parse(String(raw)) as IncomingMessage;
+      parsed = JSON.parse(String(raw));
     } catch {
       return;
     }
 
-    if (parsed.type === "snapshot") {
-      this.players = parsed.players || [];
-      this.ranking = parsed.ranking || [];
+    if (!parsed || typeof parsed !== "object" || !("type" in parsed)) {
+      return;
+    }
+
+    const message = parsed as IncomingMessage;
+
+    if (message.type === "snapshot") {
+      this.players = message.players || [];
+      this.ranking = message.ranking || [];
       this.notifyPlayers();
       this.notifyRanking();
       return;
     }
 
-    if (parsed.type === "ranking") {
-      this.ranking = parsed.ranking || [];
+    if (message.type === "ranking") {
+      this.ranking = message.ranking || [];
       this.notifyRanking();
       return;
     }
 
-    if (parsed.type === "error") {
-      console.warn("[live-room]", parsed.message);
+    if (message.type === "chat-history") {
+      this.chatMessages = message.messages || [];
+      this.notifyChat();
+      return;
+    }
+
+    if (message.type === "chat") {
+      this.chatMessages = [...this.chatMessages, message.message].slice(-80);
+      this.notifyChat();
+      return;
+    }
+
+    if (message.type === "session-start") {
+      this.notifySessionStart({ startAt: message.startAt, initiatedBy: message.initiatedBy });
+      return;
+    }
+
+    if (message.type === "error") {
+      console.warn("[live-room]", message.message);
     }
   }
 
@@ -205,6 +294,14 @@ export function publishRanking(entry: RankingEntry) {
   client.publishRanking(entry);
 }
 
+export function sendLiveChatMessage(text: string) {
+  client.sendChat(text);
+}
+
+export function requestSessionStart(startAt: number) {
+  client.requestSessionStart(startAt);
+}
+
 export function subscribeLivePlayers(listener: PresenceListener) {
   return client.subscribePresence(listener);
 }
@@ -213,10 +310,22 @@ export function subscribeRoomRanking(listener: RankingListener) {
   return client.subscribeRanking(listener);
 }
 
+export function subscribeSessionStart(listener: SessionStartListener) {
+  return client.subscribeSessionStart(listener);
+}
+
+export function subscribeLiveChat(listener: ChatListener) {
+  return client.subscribeChat(listener);
+}
+
 export function getLivePlayersSnapshot() {
   return client.getPlayers();
 }
 
 export function getRoomRankingSnapshot() {
   return client.getRanking();
+}
+
+export function getLiveChatSnapshot() {
+  return client.getChatMessages();
 }

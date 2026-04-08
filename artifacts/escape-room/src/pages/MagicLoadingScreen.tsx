@@ -45,7 +45,7 @@ export default function MagicLoadingScreen() {
           />
         </div>
 
-        <p className="mt-3 text-xs text-slate-300 tracking-wide">Preparando salas, pistas y desafios en tiempo real...</p>
+        <p className="mt-3 text-xs text-slate-300 tracking-wide">Preparando salas, pistas y desafíos en tiempo real...</p>
       </div>
     </div>
   );

@@ -21,7 +21,7 @@ export default function WelcomeScreen() {
         <p className="text-[11px] uppercase tracking-[0.28em] text-amber-700/85 font-semibold">Bienvenida</p>
         <h1 className="lux-heading text-5xl md:text-7xl mt-4">Biblioteca del Tiempo</h1>
         <p className={`mt-5 text-sm md:text-lg leading-relaxed max-w-xl mx-auto ${isSoftTheme ? "text-slate-700" : "text-slate-200/95"}`}>
-          Un viaje narrativo de comprension lectora, diseno inmersivo y desafios cooperativos en tiempo real.
+          Un viaje narrativo de comprensión lectora, diseño inmersivo y desafíos cooperativos en tiempo real.
         </p>
 
         <motion.button

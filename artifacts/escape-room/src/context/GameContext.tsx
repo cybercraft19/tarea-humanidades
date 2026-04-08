@@ -27,6 +27,7 @@ export interface GameState {
   teamName: string;
   teamMembers: string;
   teamAvatar: string;
+  lobbyReady: boolean;
   roomCode: string;
   roomRole: "host" | "guest" | null;
   musicEnabled: boolean | null;
@@ -38,6 +39,7 @@ export interface GameState {
 interface GameContextValue {
   state: GameState;
   setTeamInfo: (name: string, members: string, avatar: string) => void;
+  setLobbyReady: (ready: boolean) => void;
   setRoomSession: (roomCode: string, role: "host" | "guest" | null) => void;
   setMusicPreference: (enabled: boolean) => void;
   setVisualTheme: (theme: VisualTheme) => void;
@@ -64,6 +66,33 @@ function createPlayerId() {
   return `p-${Math.random().toString(36).slice(2, 10)}`;
 }
 
+function readStoredTeamProfile() {
+  if (typeof window === "undefined") {
+    return { teamName: "", teamMembers: "", teamAvatar: "🦉" };
+  }
+
+  try {
+    const raw = localStorage.getItem("escape-room:team-profile");
+    if (!raw) return { teamName: "", teamMembers: "", teamAvatar: "🦉" };
+
+    const parsed = JSON.parse(raw) as {
+      teamName?: string;
+      teamMembers?: string;
+      teamAvatar?: string;
+    };
+
+    return {
+      teamName: parsed.teamName || "",
+      teamMembers: parsed.teamMembers || "",
+      teamAvatar: parsed.teamAvatar || "🦉",
+    };
+  } catch {
+    return { teamName: "", teamMembers: "", teamAvatar: "🦉" };
+  }
+}
+
+const storedTeamProfile = readStoredTeamProfile();
+
 const initialState: GameState = {
   currentScreen: "welcome",
   playerId: createPlayerId(),
@@ -73,9 +102,10 @@ const initialState: GameState = {
   essayAnswers: {},
   hintsUsedByRoom: {},
   totalPenaltySeconds: 0,
-  teamName: "",
-  teamMembers: "",
-  teamAvatar: "🦉",
+  teamName: storedTeamProfile.teamName,
+  teamMembers: storedTeamProfile.teamMembers,
+  teamAvatar: storedTeamProfile.teamAvatar,
+  lobbyReady: false,
   roomCode: "",
   roomRole: null,
   musicEnabled: null,
@@ -90,7 +120,17 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<GameState>(initialState);
 
   const setTeamInfo = (name: string, members: string, avatar: string) => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem(
+        "escape-room:team-profile",
+        JSON.stringify({ teamName: name, teamMembers: members, teamAvatar: avatar }),
+      );
+    }
     setState((prev) => ({ ...prev, teamName: name, teamMembers: members, teamAvatar: avatar }));
+  };
+
+  const setLobbyReady = (ready: boolean) => {
+    setState((prev) => ({ ...prev, lobbyReady: ready }));
   };
 
   const setRoomSession = (roomCode: string, role: "host" | "guest" | null) => {
@@ -204,6 +244,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
       value={{
         state,
         setTeamInfo,
+        setLobbyReady,
         setRoomSession,
         setMusicPreference,
         setVisualTheme,

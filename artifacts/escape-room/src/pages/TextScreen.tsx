@@ -64,7 +64,7 @@ export default function TextScreen() {
             </div>
           </div>
           <div className="text-right">
-            <p className={`text-[11px] uppercase tracking-widest ${isSoftTheme ? "text-slate-500" : "text-gray-500"}`}>Cronometro</p>
+            <p className={`text-[11px] uppercase tracking-widest ${isSoftTheme ? "text-slate-500" : "text-gray-500"}`}>Cronómetro</p>
             <p className="text-sm font-bold text-amber-400">{formatDuration(totalSeconds)}</p>
             <p className="text-[11px] text-amber-400">Conectados: {liveCount}</p>
           </div>
@@ -86,7 +86,7 @@ export default function TextScreen() {
         <div className="mb-8">
           <div className="flex items-center justify-between mb-2">
             <span className={`text-xs ${isSoftTheme ? "text-slate-500" : "text-gray-400"}`}>Progreso del juego</span>
-            <span className={`text-xs ${isSoftTheme ? "text-slate-500" : "text-gray-400"}`}>{state.keysCollected.length}/4 claves · Penalizacion: {state.totalPenaltySeconds}s</span>
+            <span className={`text-xs ${isSoftTheme ? "text-slate-500" : "text-gray-400"}`}>{state.keysCollected.length}/4 claves · Penalización: {state.totalPenaltySeconds}s</span>
           </div>
           <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
             <motion.div
@@ -131,7 +131,7 @@ export default function TextScreen() {
           className="bg-amber-400/10 border border-amber-400/30 rounded-xl p-4 mb-8"
         >
           <p className="text-amber-400 text-sm leading-relaxed">
-            <span className="font-semibold">Instruccion:</span> Lee el texto completo con atención antes de intentar responder los retos.
+            <span className="font-semibold">Instrucción:</span> Lee el texto completo con atención antes de intentar responder los retos.
             No podrás avanzar sin comprender lo que dice. Puedes regresar a releerlo cuantas veces necesites.
           </p>
         </motion.div>

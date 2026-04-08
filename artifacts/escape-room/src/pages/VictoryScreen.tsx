@@ -78,7 +78,7 @@ export default function VictoryScreen() {
           transition={{ delay: 0.4 }}
         >
           <h1 className="text-4xl md:text-5xl font-black text-white mb-2">
-            ¡Mision Cumplida!
+            ¡Misión cumplida!
           </h1>
           <p className="text-amber-400 font-semibold text-lg mb-1">
             Has liberado el conocimiento de la Biblioteca del Tiempo
@@ -118,7 +118,7 @@ export default function VictoryScreen() {
           className="bg-white/5 border border-white/10 rounded-2xl p-4 mb-8"
         >
           <p className="text-xs text-gray-600">
-            Tiempo base: <span className="text-white font-semibold">{formatDuration(elapsed)}</span> · Penalizacion por pistas: <span className="text-rose-300 font-semibold">+{state.totalPenaltySeconds}s</span>
+            Tiempo base: <span className="text-white font-semibold">{formatDuration(elapsed)}</span> · Penalización por pistas: <span className="text-rose-300 font-semibold">+{state.totalPenaltySeconds}s</span>
           </p>
         </motion.div>
 
@@ -137,7 +137,7 @@ export default function VictoryScreen() {
             
             {ranking.length === 0 ? (
               <p className={`text-sm text-center ${isSoftTheme ? "text-slate-500" : "text-gray-500"}`}>
-                Aun no hay resultados registrados.
+                Aún no hay resultados registrados.
               </p>
             ) : (
               <div>
@@ -229,7 +229,7 @@ export default function VictoryScreen() {
                   <div className={`border-t ${isSoftTheme ? "border-slate-300/30" : "border-white/10"} pt-6 mt-6`}>
                     <p className={`text-xs uppercase tracking-widest mb-3 ${
                       isSoftTheme ? "text-slate-600" : "text-gray-600"
-                    }`}>Ranking Completo</p>
+                    }`}>Ranking completo</p>
                     <div className="space-y-2">
                       {ranking.slice(3, 10).map((entry, index) => (
                         <div key={entry.playerId} className={`flex items-center justify-between rounded-lg p-3 ${
@@ -260,7 +260,7 @@ export default function VictoryScreen() {
           transition={{ delay: 0.6 }}
           className="bg-white/5 border border-white/10 rounded-2xl p-6 mb-8"
         >
-          <h3 className="text-xs text-gray-600 uppercase tracking-widest mb-4">Claves obtenidas — Codigo final</h3>
+          <h3 className="text-xs text-gray-600 uppercase tracking-widest mb-4">Claves obtenidas — Código final</h3>
           <div className="flex flex-wrap gap-3 justify-center mb-4">
             {state.keysCollected.map((key, i) => (
               <motion.div
@@ -308,7 +308,7 @@ export default function VictoryScreen() {
           className="bg-gradient-to-r from-amber-500/10 to-emerald-500/10 border border-white/10 rounded-2xl p-6 mb-8"
         >
           <p className="text-gray-200 text-sm leading-relaxed">
-            Has demostrado los <strong>cuatro niveles de comprension lectora</strong>: recuperaste información literal, 
+            Has demostrado los <strong>cuatro niveles de comprensión lectora</strong>: recuperaste información literal,
             realizaste inferencias, argumentaste críticamente y aplicaste el conocimiento a nuevas situaciones. 
             Como Don Heliodoro enseñó a Valentina: <em className="text-amber-400">"El que cuida el agua, cuida la vida"</em>... 
             y el que comprende un texto, cuida el conocimiento.

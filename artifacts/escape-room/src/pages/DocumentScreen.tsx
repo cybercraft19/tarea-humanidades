@@ -38,11 +38,11 @@ export default function DocumentScreen() {
           animate={{ opacity: 1 }}
           className="text-center mb-10 pb-8 border-b border-white/20"
         >
-          <p className="text-xs text-gray-600 uppercase tracking-widest mb-3">Documento de Soporte Pedagogico</p>
+          <p className="text-xs text-gray-600 uppercase tracking-widest mb-3">Documento de soporte pedagógico</p>
           <h1 className="text-4xl font-black text-white mb-2">
             LA BIBLIOTECA DEL TIEMPO
           </h1>
-          <p className="text-amber-400 font-semibold text-lg">Escape Room de Comprension Lectora</p>
+          <p className="text-amber-400 font-semibold text-lg">Escape Room de comprensión lectora</p>
           <div className="mt-4 flex flex-wrap gap-4 justify-center text-sm text-gray-600">
             {state.teamName && (
               <span>Equipo: <strong className="text-white">{state.teamName}</strong></span>
@@ -58,7 +58,7 @@ export default function DocumentScreen() {
         <section className="mb-10">
           <h2 className="text-xl font-black text-amber-400 mb-4 flex items-center gap-2">
             <span className="w-6 h-6 bg-amber-400 rounded-full flex items-center justify-center text-black text-xs font-bold">1</span>
-            Objetivo Pedagogico
+            Objetivo pedagógico
           </h2>
           <div className="bg-white/5 border border-white/10 rounded-xl p-6">
             <p className="text-gray-200 leading-relaxed text-sm">
@@ -82,7 +82,7 @@ export default function DocumentScreen() {
         <section className="mb-10">
           <h2 className="text-xl font-black text-indigo-400 mb-4 flex items-center gap-2">
             <span className="w-6 h-6 bg-indigo-500 rounded-full flex items-center justify-center text-black text-xs font-bold">2</span>
-            Publico Objetivo
+            Público objetivo
           </h2>
           <div className="bg-white/5 border border-white/10 rounded-xl p-6">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -125,7 +125,7 @@ export default function DocumentScreen() {
           </h2>
           <div className="bg-white/5 border border-white/10 rounded-xl p-6 space-y-4">
             <div>
-              <p className="text-xs text-gray-600 uppercase tracking-widest mb-2">Introduccion</p>
+              <p className="text-xs text-gray-600 uppercase tracking-widest mb-2">Introducción</p>
               <p className="text-gray-300 text-sm leading-relaxed">{GAME_INTRO.description}</p>
             </div>
             <div className="border-t border-white/10 pt-4">
@@ -149,7 +149,7 @@ export default function DocumentScreen() {
         <section className="mb-10">
           <h2 className="text-xl font-black text-amber-400 mb-4 flex items-center gap-2">
             <span className="w-6 h-6 bg-amber-400 rounded-full flex items-center justify-center text-black text-xs font-bold">5</span>
-            Sistema General de Claves y Avance
+            Sistema general de claves y avance
           </h2>
           <div className="bg-white/5 border border-white/10 rounded-xl p-6">
             <div className="overflow-x-auto">
@@ -191,7 +191,7 @@ export default function DocumentScreen() {
         <section className="mb-10">
           <h2 className="text-xl font-black text-white mb-6 flex items-center gap-2">
             <span className="w-6 h-6 bg-white rounded-full flex items-center justify-center text-black text-xs font-bold">6</span>
-            Diseño Detallado de los 4 Retos
+            Diseño detallado de los 4 retos
           </h2>
           <div className="space-y-8">
             {ROOMS.map((room) => {
@@ -213,11 +213,11 @@ export default function DocumentScreen() {
                   {/* Details */}
                   <div className={`${room.bgCard} p-6 space-y-4`}>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <Field label="Nivel de comprension" value={ch.level} />
+                      <Field label="Nivel de comprensión" value={ch.level} />
                       <Field label="Tipo de reto" value={ch.type === "multiple" ? "Selección múltiple" : "Respuesta abierta (ensayo)"} />
                     </div>
-                    <Field label="Objetivo especifico" value={ch.objective} />
-                    <Field label="Instruccion para el jugador" value={ch.instruction} />
+                    <Field label="Objetivo específico" value={ch.objective} />
+                    <Field label="Instrucción para el jugador" value={ch.instruction} />
                     <Field label="Pregunta central" value={ch.question} />
 
                     {ch.type === "multiple" && ch.options && (
@@ -238,18 +238,18 @@ export default function DocumentScreen() {
                     )}
 
                     {ch.type === "essay" && (
-                      <Field label="Criterios de evaluacion" value={`Minimo ${ch.minWords} palabras. Debe incluir al menos 2 de estas referencias: ${(ch.correctKeywords || []).slice(0, 6).join(", ")}.`} />
+                      <Field label="Criterios de evaluación" value={`Mínimo ${ch.minWords} palabras. Debe incluir al menos 2 de estas referencias: ${(ch.correctKeywords || []).slice(0, 6).join(", ")}.`} />
                     )}
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <p className="text-xs text-gray-600 uppercase tracking-widest mb-2">Retroalimentacion si acierta</p>
+                        <p className="text-xs text-gray-600 uppercase tracking-widest mb-2">Retroalimentación si acierta</p>
                         <div className="bg-amber-400/10 border border-amber-400/20 rounded-lg p-3">
                           <p className="text-emerald-700 text-xs leading-relaxed">{ch.feedbackCorrect}</p>
                         </div>
                       </div>
                       <div>
-                        <p className="text-xs text-gray-600 uppercase tracking-widest mb-2">Retroalimentacion si falla</p>
+                        <p className="text-xs text-gray-600 uppercase tracking-widest mb-2">Retroalimentación si falla</p>
                         <div className="bg-rose-500/10 border border-rose-500/20 rounded-lg p-3">
                           <p className="text-rose-600 text-xs leading-relaxed">{ch.feedbackWrong}</p>
                         </div>
@@ -265,7 +265,7 @@ export default function DocumentScreen() {
                       </div>
                     </div>
 
-                    <Field label="Justificacion pedagogica" value={ch.pedagogicalNote} />
+                    <Field label="Justificación pedagógica" value={ch.pedagogicalNote} />
 
                     {/* Player's actual answer */}
                     {playerAnswer && (
@@ -287,7 +287,7 @@ export default function DocumentScreen() {
         <section className="mb-10">
           <h2 className="text-xl font-black text-amber-400 mb-4 flex items-center gap-2">
             <span className="w-6 h-6 bg-amber-400 rounded-full flex items-center justify-center text-black text-xs font-bold">7</span>
-            Como Fortalece la Comprension Lectora
+            Cómo fortalece la comprensión lectora
           </h2>
           <div className="bg-white/5 border border-white/10 rounded-xl p-6 space-y-5">
             {[
@@ -329,7 +329,7 @@ export default function DocumentScreen() {
         <section className="mb-10">
           <h2 className="text-xl font-black text-indigo-400 mb-4 flex items-center gap-2">
             <span className="w-6 h-6 bg-indigo-500 rounded-full flex items-center justify-center text-black text-xs font-bold">8</span>
-            Herramienta Recomendada para Publicacion
+            Herramienta recomendada para publicación
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {[
@@ -380,7 +380,7 @@ export default function DocumentScreen() {
           </div>
           <div className="mt-4 bg-amber-400/10 border border-amber-400/30 rounded-xl p-4">
             <p className="text-amber-700 text-sm leading-relaxed">
-              <strong>Conclusion:</strong> Se recomienda <strong>Genially</strong> por ser la plataforma que mejor combina 
+              <strong>Conclusión:</strong> Se recomienda <strong>Genially</strong> por ser la plataforma que mejor combina
               narrativa visual, interactividad real, facilidad de uso y opciones de gamificación. Permite crear 
               "rutas de aprendizaje" donde cada sala es una página con objetos clicables, temporizadores, 
               animaciones y condicionales de avance. Hay plantillas específicas de escape room listas para usar.

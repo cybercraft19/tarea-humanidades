@@ -129,7 +129,7 @@ export default function ChallengeScreen() {
           transition={{ delay: 0.15 }}
           className={`${room.bgCard} border ${room.borderColor} rounded-xl p-5 mb-6`}
         >
-          <p className="text-xs text-gray-600 uppercase tracking-widest mb-2">Instruccion</p>
+          <p className="text-xs text-gray-600 uppercase tracking-widest mb-2">Instrucción</p>
           <p className="text-gray-200 text-sm leading-relaxed">{challenge.instruction}</p>
         </motion.div>
 
@@ -172,7 +172,7 @@ export default function ChallengeScreen() {
                 value={essayText}
                 onChange={(e) => { setEssayText(e.target.value); setFeedback("idle"); }}
                 disabled={feedback === "correct" || alreadyCompleted}
-                placeholder="Escribe tu respuesta aqui..."
+                placeholder="Escribe tu respuesta aquí..."
                 rows={6}
                 className="w-full bg-white/5 border border-white/20 rounded-xl p-4 text-white placeholder-gray-600 text-sm leading-relaxed focus:outline-none focus:border-white/40 transition-colors resize-none"
               />
@@ -225,7 +225,7 @@ export default function ChallengeScreen() {
         )}
 
         <p className="text-[11px] text-gray-500 mb-4">
-          Penalizacion acumulada: {state.totalPenaltySeconds}s
+          Penalización acumulada: {state.totalPenaltySeconds}s
         </p>
 
         {/* Feedback */}
@@ -302,7 +302,7 @@ export default function ChallengeScreen() {
 
         {/* Pedagogical note (footer) */}
         <div className="mt-8 bg-white/3 border border-white/8 rounded-xl p-4">
-          <p className="text-xs text-gray-500 uppercase tracking-widest mb-1">Fundamento pedagogico</p>
+          <p className="text-xs text-gray-500 uppercase tracking-widest mb-1">Fundamento pedagógico</p>
           <p className="text-gray-600 text-xs leading-relaxed">{challenge.pedagogicalNote}</p>
         </div>
       </div>

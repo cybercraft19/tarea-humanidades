@@ -48,7 +48,7 @@ export default function IntroScreen() {
 
   const handleStart = () => {
     if (!state.roomCode) {
-      setError("Primero crea o unete a una sala desde el lobby.");
+      setError("Primero crea o únete a una sala desde el lobby.");
       return;
     }
     if (!name.trim()) {
@@ -77,14 +77,14 @@ export default function IntroScreen() {
       {state.musicEnabled === null && (
         <div className="absolute inset-0 z-30 bg-black/70 backdrop-blur-sm flex items-center justify-center px-4">
           <div className={`w-full max-w-md rounded-2xl border p-6 text-center backdrop-blur-lg ${isSoftTheme ? "border-slate-400/30 bg-white/78" : "border-white/15 bg-black/60"}`}>
-            <h2 className="lux-heading text-3xl text-white">Musica ambiental</h2>
-            <p className="mt-2 text-sm text-gray-300">Quieren jugar con musica de fondo?</p>
+            <h2 className="lux-heading text-3xl text-white">Música ambiental</h2>
+            <p className="mt-2 text-sm text-gray-300">¿Quieren jugar con música de fondo?</p>
             <div className="mt-5 grid grid-cols-2 gap-3">
               <button
                 onClick={() => setMusicPreference(true)}
                 className="rounded-xl bg-amber-400 text-black px-4 py-3 text-sm font-bold transition-colors hover:bg-amber-300"
               >
-                Si, con musica
+                Sí, con música
               </button>
               <button
                 onClick={() => setMusicPreference(false)}
@@ -138,7 +138,7 @@ export default function IntroScreen() {
               onClick={() => setMusicPreference(state.musicEnabled !== true)}
               className="rounded-full border border-amber-300/30 bg-amber-300/10 px-4 py-2 text-xs font-semibold tracking-wide text-amber-700 transition-colors hover:bg-amber-300/15"
             >
-              {state.musicEnabled === true ? "Musica: activa" : "Musica: desactivada"}
+              {state.musicEnabled === true ? "Música: activa" : "Música: desactivada"}
             </button>
           </div>
         </motion.div>
@@ -160,7 +160,7 @@ export default function IntroScreen() {
           transition={{ delay: 0.6 }}
           className={`rounded-2xl border p-6 backdrop-blur-md ${isSoftTheme ? "border-slate-400/30 bg-white/72" : "border-white/15 bg-black/45"}`}
         >
-          <h3 className="text-sm font-semibold text-gray-300 mb-4">Identificacion del equipo</h3>
+          <h3 className="text-sm font-semibold text-gray-300 mb-4">Identificación del equipo</h3>
           <div className="space-y-4">
             <div>
               <label className="text-xs text-gray-600 mb-2 block">Avatar del equipo</label>

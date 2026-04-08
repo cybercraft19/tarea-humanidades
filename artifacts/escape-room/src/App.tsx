@@ -49,9 +49,10 @@ function LivePresenceBridge() {
     const publish = () => {
       publishPresence({
         playerId: state.playerId,
-        displayName: state.teamName
-          ? `${state.teamAvatar} ${state.teamName}`
-          : `${state.teamAvatar} Jugador-${state.playerId.slice(0, 4)}`,
+        displayName: state.teamName || `Jugador-${state.playerId.slice(0, 4)}`,
+        teamName: state.teamName || undefined,
+        teamAvatar: state.teamAvatar,
+        lobbyReady: state.lobbyReady,
         role: state.roomRole,
         currentScreen: state.currentScreen,
         currentRoom: state.currentRoom,
@@ -72,7 +73,7 @@ function LivePresenceBridge() {
       window.clearInterval(intervalId);
       window.removeEventListener("beforeunload", onBeforeUnload);
     };
-  }, [state.roomCode, state.playerId, state.teamName, state.teamAvatar, state.roomRole, state.currentScreen, state.currentRoom, state.keysCollected.length]);
+  }, [state.roomCode, state.playerId, state.teamName, state.teamAvatar, state.lobbyReady, state.roomRole, state.currentScreen, state.currentRoom, state.keysCollected.length]);
 
   return null;
 }

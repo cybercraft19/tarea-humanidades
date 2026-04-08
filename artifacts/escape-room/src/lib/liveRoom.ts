@@ -1,11 +1,24 @@
 export interface LivePlayer {
   playerId: string;
   displayName: string;
+  teamName?: string;
+  teamAvatar?: string;
+  lobbyReady?: boolean;
   role: "host" | "guest" | null;
   currentScreen: string;
   currentRoom: number;
   keysCollectedCount: number;
   lastSeen: number;
+}
+
+export interface LiveChatMessage {
+  id: string;
+  roomCode: string;
+  playerId: string;
+  displayName: string;
+  teamAvatar?: string;
+  text: string;
+  createdAt: number;
 }
 
 export interface RankingEntry {

@@ -3,7 +3,7 @@ import { createServer } from "node:http";
 
 const port = Number(process.env.PORT || process.env.LIVE_ROOM_PORT || 8787);
 
-/** @type {Map<string, {players: Map<string, any>, ranking: Map<string, any>}>} */
+/** @type {Map<string, {players: Map<string, any>, ranking: Map<string, any>, chat: any[]}>} */
 const rooms = new Map();
 
 function ensureRoom(roomCode) {
@@ -11,6 +11,7 @@ function ensureRoom(roomCode) {
     rooms.set(roomCode, {
       players: new Map(),
       ranking: new Map(),
+      chat: [],
     });
   }
   return rooms.get(roomCode);
@@ -26,6 +27,12 @@ function getRanking(roomCode) {
   const room = rooms.get(roomCode);
   if (!room) return [];
   return Array.from(room.ranking.values()).sort((a, b) => a.totalSeconds - b.totalSeconds);
+}
+
+function getChat(roomCode) {
+  const room = rooms.get(roomCode);
+  if (!room) return [];
+  return room.chat || [];
 }
 
 function send(socket, payload) {
@@ -105,6 +112,10 @@ wss.on("connection", (socket) => {
         players: getPlayers(roomCode),
         ranking: getRanking(roomCode),
       });
+      send(socket, {
+        type: "chat-history",
+        messages: getChat(roomCode),
+      });
       broadcastSnapshot(roomCode);
       return;
     }
@@ -143,6 +154,54 @@ wss.on("connection", (socket) => {
         });
       }
       broadcastToRoom(socket.roomCode, { type: "ranking", ranking: getRanking(socket.roomCode) });
+      return;
+    }
+
+    if (data.type === "start-session") {
+      const room = ensureRoom(socket.roomCode);
+      const starter = room.players.get(socket.playerId);
+      if (!starter || starter.role !== "host") {
+        send(socket, { type: "error", message: "Only host can start session" });
+        return;
+      }
+
+      const lobbyPlayers = getPlayers(socket.roomCode).filter(
+        (p) => p.currentScreen === "lobby" || p.currentScreen === "intro",
+      );
+      const everyoneReady = lobbyPlayers.length > 0 && lobbyPlayers.every((p) => Boolean(p.lobbyReady));
+      if (!everyoneReady) {
+        send(socket, { type: "error", message: "All players must be ready" });
+        return;
+      }
+
+      const requested = Number(data.startAt);
+      const startAt = Number.isFinite(requested) ? Math.max(Date.now() + 500, requested) : Date.now() + 3000;
+      broadcastToRoom(socket.roomCode, {
+        type: "session-start",
+        startAt,
+        initiatedBy: socket.playerId,
+      });
+      return;
+    }
+
+    if (data.type === "chat") {
+      const room = ensureRoom(socket.roomCode);
+      const sender = room.players.get(socket.playerId);
+      const text = String(data.text || "").trim();
+      if (!text) return;
+
+      const message = {
+        id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        roomCode: socket.roomCode,
+        playerId: socket.playerId,
+        displayName: sender?.teamName || sender?.displayName || `Jugador-${socket.playerId.slice(0, 4)}`,
+        teamAvatar: sender?.teamAvatar || "🦉",
+        text: text.slice(0, 280),
+        createdAt: Date.now(),
+      };
+
+      room.chat = [...(room.chat || []), message].slice(-80);
+      broadcastToRoom(socket.roomCode, { type: "chat", message });
       return;
     }
 
