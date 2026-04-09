@@ -9,6 +9,9 @@ import {
 export default function IntroScreen() {
   const { state, setTeamInfo, setMusicPreference, startGame } = useGame();
   const isSoftTheme = state.visualTheme !== "dark-lux";
+  const [playMode, setPlayMode] = useState<"individual" | "equipo">(
+    state.teamMembers.trim() ? "equipo" : "individual",
+  );
   const [name, setName] = useState(state.teamName);
   const [members, setMembers] = useState(state.teamMembers);
   const [error, setError] = useState("");
@@ -52,11 +55,16 @@ export default function IntroScreen() {
       return;
     }
     if (!name.trim()) {
-      setError("Por favor, escribe el nombre de tu equipo.");
+      setError(playMode === "equipo" ? "Por favor, escribe el nombre de tu equipo." : "Por favor, escribe tu nombre.");
       return;
     }
 
-    setTeamInfo(name.trim(), members.trim(), state.teamAvatar || DEFAULT_TEAM_AVATAR);
+    const normalizedName = name.trim();
+    const normalizedMembers = playMode === "individual"
+      ? normalizedName
+      : members.trim();
+
+    setTeamInfo(normalizedName, normalizedMembers, state.teamAvatar || DEFAULT_TEAM_AVATAR);
     startGame();
   };
 
@@ -160,10 +168,40 @@ export default function IntroScreen() {
           transition={{ delay: 0.6 }}
           className={`rounded-2xl border p-6 backdrop-blur-md ${isSoftTheme ? "border-slate-400/30 bg-white/72" : "border-white/15 bg-black/45"}`}
         >
-          <h3 className="text-sm font-semibold text-gray-300 mb-4">Identificación del equipo</h3>
+          <h3 className="text-sm font-semibold text-gray-300 mb-4">Identificación {playMode === "equipo" ? "del equipo" : "individual"}</h3>
           <div className="space-y-4">
             <div>
-              <label className="text-xs text-gray-600 mb-1.5 block">Nombre del equipo *</label>
+              <p className="text-xs text-gray-600 mb-1.5 block">Modo de juego</p>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setPlayMode("individual")}
+                  className={`rounded-xl border px-3 py-2 text-sm font-bold transition-colors ${
+                    playMode === "individual"
+                      ? "border-amber-400/70 bg-amber-400 text-black"
+                      : "border-white/20 bg-white/10 text-white hover:bg-white/15"
+                  }`}
+                >
+                  Individual
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPlayMode("equipo")}
+                  className={`rounded-xl border px-3 py-2 text-sm font-bold transition-colors ${
+                    playMode === "equipo"
+                      ? "border-amber-400/70 bg-amber-400 text-black"
+                      : "border-white/20 bg-white/10 text-white hover:bg-white/15"
+                  }`}
+                >
+                  Equipo
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <label className="text-xs text-gray-600 mb-1.5 block">
+                {playMode === "equipo" ? "Nombre del equipo *" : "Nombre del jugador *"}
+              </label>
               <input
                 type="text"
                 value={name}
@@ -175,16 +213,23 @@ export default function IntroScreen() {
                 className="w-full rounded-xl px-4 py-3 text-white placeholder-gray-500 text-sm transition-colors bg-white/10 border border-white/20 focus:outline-none focus:border-amber-400/70"
               />
             </div>
-            <div>
-              <label className="text-xs text-gray-600 mb-1.5 block">Integrantes del grupo (opcional)</label>
-              <textarea
-                value={members}
-                onChange={(e) => setMembers(e.target.value)}
-                placeholder="Ej: el pepe, carlitos, ozuna 🙈"
-                rows={2}
-                className="w-full rounded-xl px-4 py-3 text-white placeholder-gray-500 text-sm transition-colors resize-none bg-white/10 border border-white/20 focus:outline-none focus:border-amber-400/70"
-              />
-            </div>
+
+            {playMode === "equipo" ? (
+              <div>
+                <label className="text-xs text-gray-600 mb-1.5 block">Integrantes del grupo (opcional)</label>
+                <textarea
+                  value={members}
+                  onChange={(e) => setMembers(e.target.value)}
+                  placeholder="Ej: pablo, paula, juan"
+                  rows={2}
+                  className="w-full rounded-xl px-4 py-3 text-white placeholder-gray-500 text-sm transition-colors resize-none bg-white/10 border border-white/20 focus:outline-none focus:border-amber-400/70"
+                />
+              </div>
+            ) : (
+              <p className="rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-xs text-gray-300">
+                En modo individual no necesitas agregar integrantes.
+              </p>
+            )}
 
             {error && <p className="text-rose-400 text-xs">{error}</p>}
             <button
