@@ -56,7 +56,7 @@ function getInitials(teamName: string) {
 }
 
 function buildAchievementLines(achievementIds: AchievementId[]) {
-  return achievementIds.slice(0, 4).map((id) => ACHIEVEMENTS[id].title);
+  return achievementIds.slice(0, 3).map((id) => ACHIEVEMENTS[id].title);
 }
 
 export function buildCertificateSvg(payload: CertificatePayload) {
@@ -67,101 +67,97 @@ export function buildCertificateSvg(payload: CertificatePayload) {
   const safeDate = escapeXml(payload.completedAtLabel || "—");
   const achievements = buildAchievementLines(payload.achievementIds);
   const initials = escapeXml(getInitials(teamName || "Equipo"));
-  const teamNameLines = splitIntoLines(teamName, 24, 2);
-  const membersLines = splitIntoLines(members, 80, 2);
+  const teamNameLines = splitIntoLines(teamName, 26, 2);
+  const membersLines = splitIntoLines(members, 70, 1);
   const missionLines = splitIntoLines(
-    "Por completar la misión, resolver los cuatro retos y liberar el conocimiento de la biblioteca.",
-    62,
+    "Por completar la mision y resolver los retos de lectura.",
+    48,
     2,
   );
 
   const photo = payload.photoDataUrl ? `
         <clipPath id="photoClip">
-          <circle cx="1235" cy="360" r="140" />
+          <circle cx="1110" cy="290" r="110" />
         </clipPath>
-        <image href="${payload.photoDataUrl}" x="1095" y="220" width="280" height="280" preserveAspectRatio="xMidYMid slice" clip-path="url(#photoClip)" />
-        <circle cx="1235" cy="360" r="144" fill="none" stroke="rgba(251, 191, 36, 0.95)" stroke-width="8" />
+        <image href="${payload.photoDataUrl}" x="1000" y="180" width="220" height="220" preserveAspectRatio="xMidYMid slice" clip-path="url(#photoClip)" />
+        <circle cx="1110" cy="290" r="112" fill="none" stroke="#fbbf24" stroke-width="6" />
       ` : `
-        <circle cx="1235" cy="360" r="140" fill="rgba(15, 23, 42, 0.75)" stroke="rgba(251, 191, 36, 0.95)" stroke-width="8" />
-        <text x="1235" y="382" text-anchor="middle" font-family="Montserrat, Arial, sans-serif" font-size="76" font-weight="800" fill="#fbbf24">${initials}</text>
-        <text x="1235" y="426" text-anchor="middle" font-family="Montserrat, Arial, sans-serif" font-size="22" font-weight="700" fill="#fde68a">Foto opcional</text>
+        <circle cx="1110" cy="290" r="110" fill="#0f172a" stroke="#fbbf24" stroke-width="6" />
+        <text x="1110" y="308" text-anchor="middle" font-family="Montserrat, Arial, sans-serif" font-size="56" font-weight="800" fill="#fbbf24">${initials}</text>
       `;
 
   const achievementMarkup = achievements.length === 0
-    ? `<text x="190" y="828" font-family="Montserrat, Arial, sans-serif" font-size="22" fill="#cbd5e1">Sin logros visibles.</text>`
+    ? `<text x="160" y="650" font-family="Montserrat, Arial, sans-serif" font-size="22" fill="#94a3b8">Sin logros destacados.</text>`
     : achievements.map((title, index) => {
-        const y = 810 + index * 42;
+        const y = 650 + index * 44;
         return `
-          <rect x="170" y="${y - 23}" width="1260" height="34" rx="12" fill="rgba(251, 191, 36, 0.10)" stroke="rgba(251, 191, 36, 0.22)" />
-          <text x="196" y="${y}" font-family="Montserrat, Arial, sans-serif" font-size="20" fill="#fef3c7">• ${escapeXml(title)}</text>
+          <text x="160" y="${y}" font-family="Montserrat, Arial, sans-serif" font-size="24" fill="#e2e8f0">• ${escapeXml(title)}</text>
         `;
       }).join("");
 
   return `<?xml version="1.0" encoding="UTF-8"?>
-<svg width="1600" height="1100" viewBox="0 0 1600 1100" fill="none" xmlns="http://www.w3.org/2000/svg">
+<svg width="1400" height="900" viewBox="0 0 1400 900" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1600" y2="1100" gradientUnits="userSpaceOnUse">
+    <linearGradient id="bg" x1="0" y1="0" x2="1400" y2="900" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#020617" />
       <stop offset="0.55" stop-color="#0f172a" />
       <stop offset="1" stop-color="#111827" />
     </linearGradient>
-    <linearGradient id="panel" x1="140" y1="130" x2="1460" y2="980" gradientUnits="userSpaceOnUse">
+    <linearGradient id="panel" x1="90" y1="80" x2="1310" y2="820" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="rgba(30, 41, 59, 0.98)" />
       <stop offset="1" stop-color="rgba(15, 23, 42, 0.94)" />
     </linearGradient>
-    <linearGradient id="gold" x1="170" y1="180" x2="1430" y2="930" gradientUnits="userSpaceOnUse">
+    <linearGradient id="gold" x1="120" y1="120" x2="1280" y2="760" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#fef3c7" />
       <stop offset="0.5" stop-color="#fbbf24" />
       <stop offset="1" stop-color="#d97706" />
     </linearGradient>
-    <filter id="shadow" x="80" y="90" width="1440" height="980" filterUnits="userSpaceOnUse">
-      <feDropShadow dx="0" dy="22" stdDeviation="28" flood-color="#000000" flood-opacity="0.45" />
+    <filter id="shadow" x="50" y="50" width="1300" height="820" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="16" stdDeviation="20" flood-color="#000000" flood-opacity="0.45" />
     </filter>
   </defs>
 
-  <rect width="1600" height="1100" fill="url(#bg)" />
-  <circle cx="260" cy="200" r="190" fill="rgba(251, 191, 36, 0.09)" />
-  <circle cx="1360" cy="170" r="150" fill="rgba(59, 130, 246, 0.1)" />
-  <circle cx="1260" cy="940" r="210" fill="rgba(251, 191, 36, 0.07)" />
+  <rect width="1400" height="900" fill="url(#bg)" />
+  <circle cx="220" cy="160" r="160" fill="rgba(251, 191, 36, 0.08)" />
+  <circle cx="1240" cy="120" r="120" fill="rgba(59, 130, 246, 0.08)" />
 
-  <rect x="80" y="70" width="1440" height="960" rx="42" fill="url(#panel)" stroke="url(#gold)" stroke-width="3" filter="url(#shadow)" />
-  <rect x="110" y="100" width="1380" height="900" rx="34" fill="none" stroke="rgba(251, 191, 36, 0.22)" stroke-width="2" />
+  <rect x="70" y="60" width="1260" height="780" rx="36" fill="url(#panel)" stroke="url(#gold)" stroke-width="3" filter="url(#shadow)" />
+  <rect x="92" y="82" width="1216" height="736" rx="28" fill="none" stroke="rgba(251, 191, 36, 0.22)" stroke-width="2" />
 
-  <text x="800" y="166" text-anchor="middle" font-family="Montserrat, Arial, sans-serif" font-size="28" font-weight="700" letter-spacing="6" fill="#fbbf24">CERTIFICADO AUTOMATICO</text>
-  <text x="800" y="226" text-anchor="middle" font-family="Montserrat, Arial, sans-serif" font-size="56" font-weight="900" fill="#ffffff">La Biblioteca del Tiempo</text>
-  <text x="800" y="278" text-anchor="middle" font-family="Montserrat, Arial, sans-serif" font-size="23" font-weight="500" fill="#cbd5e1">Escape room de comprension lectora</text>
+  <text x="700" y="145" text-anchor="middle" font-family="Montserrat, Arial, sans-serif" font-size="42" font-weight="900" fill="#ffffff">CERTIFICADO</text>
+  <text x="700" y="182" text-anchor="middle" font-family="Montserrat, Arial, sans-serif" font-size="26" font-weight="700" fill="#fbbf24">La Biblioteca del Tiempo</text>
 
-  <text x="170" y="372" font-family="Montserrat, Arial, sans-serif" font-size="22" font-weight="700" fill="#fbbf24">Se otorga a</text>
-  <text x="170" y="430" font-family="Montserrat, Arial, sans-serif" font-size="60" font-weight="900" fill="#ffffff">${buildTspans(teamNameLines, 170, 430, 62)}</text>
-  <text x="170" y="540" font-family="Montserrat, Arial, sans-serif" font-size="22" font-weight="500" fill="#cbd5e1">${buildTspans(missionLines, 170, 540, 34)}</text>
+  <text x="160" y="260" font-family="Montserrat, Arial, sans-serif" font-size="22" font-weight="700" fill="#fbbf24">Otorgado a</text>
+  <text x="160" y="314" font-family="Montserrat, Arial, sans-serif" font-size="54" font-weight="900" fill="#ffffff">${buildTspans(teamNameLines, 160, 314, 58)}</text>
+  <text x="160" y="418" font-family="Montserrat, Arial, sans-serif" font-size="24" font-weight="500" fill="#cbd5e1">${buildTspans(missionLines, 160, 418, 34)}</text>
 
-  <rect x="160" y="610" width="860" height="150" rx="24" fill="rgba(255, 255, 255, 0.04)" stroke="rgba(255, 255, 255, 0.08)" />
+  <rect x="150" y="462" width="760" height="132" rx="20" fill="rgba(255, 255, 255, 0.04)" stroke="rgba(255, 255, 255, 0.08)" />
   <g>
-    <rect x="190" y="642" width="240" height="88" rx="20" fill="rgba(251, 191, 36, 0.12)" stroke="rgba(251, 191, 36, 0.25)" />
-    <text x="220" y="673" font-family="Montserrat, Arial, sans-serif" font-size="18" font-weight="700" fill="#fde68a">Sala</text>
-    <text x="220" y="712" font-family="Montserrat, Arial, sans-serif" font-size="30" font-weight="900" fill="#ffffff">${safeRoomCode}</text>
+    <rect x="175" y="486" width="220" height="84" rx="16" fill="rgba(251, 191, 36, 0.14)" />
+    <text x="198" y="516" font-family="Montserrat, Arial, sans-serif" font-size="18" font-weight="700" fill="#fde68a">Sala</text>
+    <text x="198" y="552" font-family="Montserrat, Arial, sans-serif" font-size="36" font-weight="900" fill="#ffffff">${safeRoomCode}</text>
 
-    <rect x="450" y="642" width="240" height="88" rx="20" fill="rgba(59, 130, 246, 0.12)" stroke="rgba(96, 165, 250, 0.24)" />
-    <text x="480" y="673" font-family="Montserrat, Arial, sans-serif" font-size="18" font-weight="700" fill="#bfdbfe">Tiempo</text>
-    <text x="480" y="712" font-family="Montserrat, Arial, sans-serif" font-size="30" font-weight="900" fill="#ffffff">${safeDuration}</text>
+    <rect x="420" y="486" width="220" height="84" rx="16" fill="rgba(59, 130, 246, 0.14)" />
+    <text x="443" y="516" font-family="Montserrat, Arial, sans-serif" font-size="18" font-weight="700" fill="#bfdbfe">Tiempo</text>
+    <text x="443" y="552" font-family="Montserrat, Arial, sans-serif" font-size="36" font-weight="900" fill="#ffffff">${safeDuration}</text>
 
-    <rect x="710" y="642" width="280" height="88" rx="20" fill="rgba(16, 185, 129, 0.12)" stroke="rgba(52, 211, 153, 0.24)" />
-    <text x="740" y="673" font-family="Montserrat, Arial, sans-serif" font-size="18" font-weight="700" fill="#bbf7d0">Fecha</text>
-    <text x="740" y="711" font-family="Montserrat, Arial, sans-serif" font-size="22" font-weight="900" fill="#ffffff">${safeDate}</text>
+    <rect x="665" y="486" width="220" height="84" rx="16" fill="rgba(16, 185, 129, 0.14)" />
+    <text x="688" y="516" font-family="Montserrat, Arial, sans-serif" font-size="18" font-weight="700" fill="#bbf7d0">Fecha</text>
+    <text x="688" y="550" font-family="Montserrat, Arial, sans-serif" font-size="24" font-weight="900" fill="#ffffff">${safeDate}</text>
   </g>
 
   <g>
-    <rect x="1035" y="180" width="410" height="400" rx="30" fill="rgba(255, 255, 255, 0.04)" stroke="rgba(251, 191, 36, 0.22)" />
+    <rect x="945" y="160" width="330" height="460" rx="24" fill="rgba(255, 255, 255, 0.04)" stroke="rgba(251, 191, 36, 0.22)" />
     ${photo}
-    <text x="1240" y="564" text-anchor="middle" font-family="Montserrat, Arial, sans-serif" font-size="20" font-weight="700" fill="#cbd5e1">Foto de equipo opcional</text>
+    <text x="1110" y="450" text-anchor="middle" font-family="Montserrat, Arial, sans-serif" font-size="19" font-weight="700" fill="#cbd5e1">Foto opcional</text>
   </g>
 
-  <text x="170" y="774" font-family="Montserrat, Arial, sans-serif" font-size="24" font-weight="800" fill="#fbbf24">Logros visibles</text>
+  <text x="160" y="620" font-family="Montserrat, Arial, sans-serif" font-size="26" font-weight="800" fill="#fbbf24">Logros</text>
   ${achievementMarkup}
 
-  <text x="800" y="946" text-anchor="middle" font-family="Montserrat, Arial, sans-serif" font-size="14" font-weight="500" fill="#94a3b8">Reconocimiento generado automaticamente por el sistema del escape room.</text>
-  <rect x="160" y="960" width="1280" height="34" rx="12" fill="rgba(251, 191, 36, 0.08)" stroke="rgba(251, 191, 36, 0.22)" />
-  <text x="800" y="983" text-anchor="middle" font-family="Montserrat, Arial, sans-serif" font-size="18" font-weight="700" fill="#fef3c7">Equipo: ${escapeXml(membersLines.join(" | "))}</text>
+  <rect x="150" y="752" width="1120" height="42" rx="12" fill="rgba(251, 191, 36, 0.08)" stroke="rgba(251, 191, 36, 0.22)" />
+  <text x="710" y="780" text-anchor="middle" font-family="Montserrat, Arial, sans-serif" font-size="18" font-weight="700" fill="#fef3c7">Equipo: ${escapeXml(membersLines.join(" | "))}</text>
+  <text x="700" y="822" text-anchor="middle" font-family="Montserrat, Arial, sans-serif" font-size="14" font-weight="500" fill="#94a3b8">Generado automaticamente por el sistema del escape room.</text>
 </svg>`;
 }
 
