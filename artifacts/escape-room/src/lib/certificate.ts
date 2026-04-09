@@ -56,7 +56,7 @@ function getInitials(teamName: string) {
 }
 
 function buildAchievementLines(achievementIds: AchievementId[]) {
-  return achievementIds.slice(0, 5).map((id) => ACHIEVEMENTS[id].title);
+  return achievementIds.slice(0, 4).map((id) => ACHIEVEMENTS[id].title);
 }
 
 export function buildCertificateSvg(payload: CertificatePayload) {
@@ -88,12 +88,12 @@ export function buildCertificateSvg(payload: CertificatePayload) {
       `;
 
   const achievementMarkup = achievements.length === 0
-    ? `<text x="190" y="848" font-family="Montserrat, Arial, sans-serif" font-size="24" fill="#cbd5e1">Sin logros visibles.</text>`
+    ? `<text x="190" y="828" font-family="Montserrat, Arial, sans-serif" font-size="22" fill="#cbd5e1">Sin logros visibles.</text>`
     : achievements.map((title, index) => {
-        const y = 848 + index * 52;
+        const y = 810 + index * 42;
         return `
-          <rect x="170" y="${y - 28}" width="1260" height="40" rx="14" fill="rgba(251, 191, 36, 0.10)" stroke="rgba(251, 191, 36, 0.22)" />
-          <text x="196" y="${y}" font-family="Montserrat, Arial, sans-serif" font-size="22" fill="#fef3c7">• ${escapeXml(title)}</text>
+          <rect x="170" y="${y - 23}" width="1260" height="34" rx="12" fill="rgba(251, 191, 36, 0.10)" stroke="rgba(251, 191, 36, 0.22)" />
+          <text x="196" y="${y}" font-family="Montserrat, Arial, sans-serif" font-size="20" fill="#fef3c7">• ${escapeXml(title)}</text>
         `;
       }).join("");
 
@@ -156,12 +156,12 @@ export function buildCertificateSvg(payload: CertificatePayload) {
     <text x="1240" y="564" text-anchor="middle" font-family="Montserrat, Arial, sans-serif" font-size="20" font-weight="700" fill="#cbd5e1">Foto de equipo opcional</text>
   </g>
 
-  <text x="170" y="804" font-family="Montserrat, Arial, sans-serif" font-size="24" font-weight="800" fill="#fbbf24">Logros visibles</text>
+  <text x="170" y="774" font-family="Montserrat, Arial, sans-serif" font-size="24" font-weight="800" fill="#fbbf24">Logros visibles</text>
   ${achievementMarkup}
 
-  <text x="800" y="1044" text-anchor="middle" font-family="Montserrat, Arial, sans-serif" font-size="16" font-weight="500" fill="#94a3b8">Reconocimiento generado automaticamente por el sistema del escape room.</text>
-  <rect x="160" y="1060" width="1280" height="42" rx="14" fill="rgba(251, 191, 36, 0.08)" stroke="rgba(251, 191, 36, 0.22)" />
-  <text x="800" y="1088" text-anchor="middle" font-family="Montserrat, Arial, sans-serif" font-size="20" font-weight="700" fill="#fef3c7">Equipo: ${escapeXml(membersLines.join(" | "))}</text>
+  <text x="800" y="946" text-anchor="middle" font-family="Montserrat, Arial, sans-serif" font-size="14" font-weight="500" fill="#94a3b8">Reconocimiento generado automaticamente por el sistema del escape room.</text>
+  <rect x="160" y="960" width="1280" height="34" rx="12" fill="rgba(251, 191, 36, 0.08)" stroke="rgba(251, 191, 36, 0.22)" />
+  <text x="800" y="983" text-anchor="middle" font-family="Montserrat, Arial, sans-serif" font-size="18" font-weight="700" fill="#fef3c7">Equipo: ${escapeXml(membersLines.join(" | "))}</text>
 </svg>`;
 }
 
