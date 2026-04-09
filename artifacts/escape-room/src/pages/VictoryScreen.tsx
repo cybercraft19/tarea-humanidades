@@ -244,7 +244,7 @@ export default function VictoryScreen() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.55 }}
-          className="grid lg:grid-cols-[1.25fr_0.75fr] gap-6 mb-8 text-left"
+          className="grid xl:grid-cols-[minmax(0,1.25fr)_minmax(320px,0.75fr)] gap-6 mb-8 text-left"
         >
           <div className={`rounded-3xl p-6 border ${isSoftTheme ? "bg-slate-100/80 border-slate-300/40" : "bg-white/5 border-white/10"}`}>
             <div className="flex flex-wrap items-start justify-between gap-4 mb-5">
@@ -262,7 +262,7 @@ export default function VictoryScreen() {
 
               <button
                 onClick={handleDownloadCertificate}
-                className="rounded-2xl bg-amber-400 px-5 py-3 font-black text-black transition-all hover:brightness-110 shadow-lg shadow-amber-400/20"
+                className="rounded-2xl bg-amber-400 px-5 py-3 font-black text-black transition-all hover:brightness-110 shadow-lg shadow-amber-400/20 w-full sm:w-auto"
               >
                 Descargar certificado
               </button>
@@ -281,7 +281,7 @@ export default function VictoryScreen() {
                 </div>
               </div>
 
-              <div className="grid gap-4 md:grid-cols-[0.8fr_1.2fr]">
+              <div className="grid gap-4 lg:grid-cols-[minmax(220px,0.85fr)_1.15fr]">
                 <div className={`rounded-3xl p-4 ${isSoftTheme ? "bg-slate-50" : "bg-white/5"} border ${isSoftTheme ? "border-slate-200" : "border-white/10"}`}>
                   <div className="mx-auto flex h-36 w-36 items-center justify-center overflow-hidden rounded-full border-4 border-amber-400/40 bg-slate-950 shadow-lg shadow-amber-400/10">
                     {teamPhotoDataUrl ? (
@@ -297,7 +297,7 @@ export default function VictoryScreen() {
                   </div>
 
                   <div className="mt-4 text-center">
-                    <p className={`text-lg font-black ${isSoftTheme ? "text-slate-900" : "text-white"}`}>
+                    <p className={`text-lg font-black break-words ${isSoftTheme ? "text-slate-900" : "text-white"}`}>
                       {state.teamName || "Equipo explorador"}
                     </p>
                     <p className={`text-xs mt-1 ${isSoftTheme ? "text-slate-500" : "text-gray-400"}`}>
@@ -306,22 +306,22 @@ export default function VictoryScreen() {
                   </div>
                 </div>
 
-                <div className="grid gap-3 sm:grid-cols-2">
+                <div className="grid gap-3 grid-cols-2 md:grid-cols-2">
                   <div className={`rounded-2xl p-4 ${isSoftTheme ? "bg-slate-50" : "bg-white/5"} border ${isSoftTheme ? "border-slate-200" : "border-white/10"}`}>
                     <p className={`text-xs uppercase tracking-widest ${isSoftTheme ? "text-slate-500" : "text-gray-400"}`}>Tiempo final</p>
-                    <p className={`text-2xl font-black mt-2 ${isSoftTheme ? "text-slate-900" : "text-white"}`}>{formatDuration(totalSeconds)}</p>
+                    <p className={`text-xl md:text-2xl font-black mt-2 leading-none ${isSoftTheme ? "text-slate-900" : "text-white"}`}>{formatDuration(totalSeconds)}</p>
                   </div>
                   <div className={`rounded-2xl p-4 ${isSoftTheme ? "bg-slate-50" : "bg-white/5"} border ${isSoftTheme ? "border-slate-200" : "border-white/10"}`}>
                     <p className={`text-xs uppercase tracking-widest ${isSoftTheme ? "text-slate-500" : "text-gray-400"}`}>Claves</p>
-                    <p className={`text-2xl font-black mt-2 ${isSoftTheme ? "text-slate-900" : "text-white"}`}>{state.keysCollected.length}/4</p>
+                    <p className={`text-xl md:text-2xl font-black mt-2 leading-none ${isSoftTheme ? "text-slate-900" : "text-white"}`}>{state.keysCollected.length}/4</p>
                   </div>
                   <div className={`rounded-2xl p-4 ${isSoftTheme ? "bg-slate-50" : "bg-white/5"} border ${isSoftTheme ? "border-slate-200" : "border-white/10"}`}>
                     <p className={`text-xs uppercase tracking-widest ${isSoftTheme ? "text-slate-500" : "text-gray-400"}`}>Logros</p>
-                    <p className={`text-2xl font-black mt-2 ${isSoftTheme ? "text-slate-900" : "text-white"}`}>{state.achievementsUnlocked.length}</p>
+                    <p className={`text-xl md:text-2xl font-black mt-2 leading-none ${isSoftTheme ? "text-slate-900" : "text-white"}`}>{state.achievementsUnlocked.length}</p>
                   </div>
                   <div className={`rounded-2xl p-4 ${isSoftTheme ? "bg-slate-50" : "bg-white/5"} border ${isSoftTheme ? "border-slate-200" : "border-white/10"}`}>
                     <p className={`text-xs uppercase tracking-widest ${isSoftTheme ? "text-slate-500" : "text-gray-400"}`}>Sala</p>
-                    <p className={`text-2xl font-black mt-2 ${isSoftTheme ? "text-slate-900" : "text-white"}`}>{state.roomCode || "—"}</p>
+                    <p className={`text-xl md:text-2xl font-black mt-2 leading-none break-all ${isSoftTheme ? "text-slate-900" : "text-white"}`}>{state.roomCode || "—"}</p>
                   </div>
                 </div>
               </div>
@@ -344,7 +344,7 @@ export default function VictoryScreen() {
           <div className={`rounded-3xl p-6 border ${isSoftTheme ? "bg-slate-100/80 border-slate-300/40" : "bg-white/5 border-white/10"}`}>
             <div className="flex items-start justify-between gap-4 mb-5">
               <div>
-                <p className={`text-xs uppercase tracking-[0.3em] font-bold ${isSoftTheme ? "text-slate-500" : "text-gray-400"}`}>
+                <p className={`text-xs uppercase tracking-[0.16em] font-bold ${isSoftTheme ? "text-slate-500" : "text-gray-400"}`}>
                   Foto de equipo opcional
                 </p>
                 <h3 className={`text-xl font-black mt-1 ${isSoftTheme ? "text-slate-900" : "text-white"}`}>
@@ -384,7 +384,7 @@ export default function VictoryScreen() {
               <canvas ref={canvasRef} className="hidden" />
             </div>
 
-            <div className="mt-4 grid grid-cols-2 gap-3">
+            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
               <button
                 onClick={cameraActive ? capturePhoto : startCamera}
                 disabled={cameraBusy}
