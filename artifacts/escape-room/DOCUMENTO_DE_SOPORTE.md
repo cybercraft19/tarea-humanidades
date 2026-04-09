@@ -8,10 +8,9 @@ Subtítulo: **Escape Room de Comprensión Lectora**.
 
 ## 2. Integrantes del grupo
 
-- Integrante 1: ____________________
-- Integrante 2: ____________________
-- Integrante 3: ____________________
-- Integrante 4: ____________________
+- Integrante 1: Camilo Andres Argumedo Villa 
+- Integrante 2: Santiago Murillo Guerrero
+- Integrante 3: Samuel Camilo Cabadia
 
 ## 3. Texto base utilizado
 

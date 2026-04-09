@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
+import { evaluateAchievements, type AchievementId } from "@/lib/achievements";
 
 export type GameScreen =
   | "welcome"
@@ -24,6 +25,7 @@ export interface GameState {
   essayAnswers: Record<number, string>;
   hintsUsedByRoom: Record<number, boolean>;
   totalPenaltySeconds: number;
+  achievementsUnlocked: AchievementId[];
   teamName: string;
   teamMembers: string;
   teamAvatar: string;
@@ -102,6 +104,7 @@ const initialState: GameState = {
   essayAnswers: {},
   hintsUsedByRoom: {},
   totalPenaltySeconds: 0,
+  achievementsUnlocked: [],
   teamName: storedTeamProfile.teamName,
   teamMembers: storedTeamProfile.teamMembers,
   teamAvatar: storedTeamProfile.teamAvatar,
@@ -228,6 +231,11 @@ export function GameProvider({ children }: { children: ReactNode }) {
       ...prev,
       currentScreen: "victory",
       endTime: Date.now(),
+      achievementsUnlocked: evaluateAchievements({
+        ...prev,
+        currentScreen: "victory",
+        endTime: Date.now(),
+      }),
     }));
   };
 

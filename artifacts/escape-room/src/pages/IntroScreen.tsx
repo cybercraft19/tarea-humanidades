@@ -3,9 +3,13 @@ import { motion } from "framer-motion";
 import { useGame } from "@/context/GameContext";
 import { GAME_INTRO } from "@/data/gameData";
 import PlayerAvatar from "@/components/PlayerAvatar";
-import { createAvatarFromFile, createCartoonAvatar, DEFAULT_TEAM_AVATAR } from "@/lib/avatarUtils";
-
-const AVATARS = ["🦉", "🦊", "🐺", "🐯", "🐙", "🦁", "🐼", "🐉"];
+import ManualAvatarBuilder from "@/components/ManualAvatarBuilder";
+import {
+  createDefaultManualAvatarProfile,
+  createAvatarFromFile,
+  createManualAvatar,
+  DEFAULT_TEAM_AVATAR,
+} from "@/lib/avatarUtils";
 
 export default function IntroScreen() {
   const { state, setTeamInfo, setMusicPreference, startGame } = useGame();
@@ -13,6 +17,7 @@ export default function IntroScreen() {
   const [name, setName] = useState(state.teamName);
   const [members, setMembers] = useState(state.teamMembers);
   const [avatar, setAvatar] = useState(state.teamAvatar || DEFAULT_TEAM_AVATAR);
+  const [manualAvatar, setManualAvatar] = useState(createDefaultManualAvatarProfile(state.teamName || ""));
   const [isAvatarLoading, setIsAvatarLoading] = useState(false);
   const [error, setError] = useState("");
   const [isNarrating, setIsNarrating] = useState(false);
@@ -78,6 +83,10 @@ export default function IntroScreen() {
     } finally {
       setIsAvatarLoading(false);
     }
+  };
+
+  const applyManualAvatar = () => {
+    setAvatar(createManualAvatar(manualAvatar));
   };
 
   return (
@@ -193,16 +202,9 @@ export default function IntroScreen() {
                 />
                 <div className="flex-1">
                   <p className="text-xs text-gray-300">
-                    Personaliza tu avatar: caricatura, foto de galeria o camara.
+                    Personaliza tu avatar con rasgos manuales o usa foto de galeria/camara.
                   </p>
                   <div className="mt-2 flex flex-wrap gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setAvatar(createCartoonAvatar())}
-                      className="rounded-lg border border-cyan-300/35 bg-cyan-400/10 px-3 py-1.5 text-[11px] font-bold text-cyan-200"
-                    >
-                      Generar caricatura
-                    </button>
                     <button
                       type="button"
                       onClick={() => galleryInputRef.current?.click()}
@@ -220,6 +222,11 @@ export default function IntroScreen() {
                   </div>
                 </div>
               </div>
+              <ManualAvatarBuilder
+                profile={manualAvatar}
+                onProfileChange={setManualAvatar}
+                onApply={applyManualAvatar}
+              />
               <input
                 ref={galleryInputRef}
                 type="file"
@@ -244,25 +251,6 @@ export default function IntroScreen() {
                 }}
               />
               {isAvatarLoading && <p className="mt-2 text-[11px] text-amber-300">Procesando imagen...</p>}
-
-              <p className="mt-3 mb-2 text-[11px] uppercase tracking-widest text-gray-500">O elige un emoji rapido</p>
-              <div className="grid grid-cols-4 sm:grid-cols-8 gap-2">
-                {AVATARS.map((item) => (
-                  <button
-                    key={item}
-                    type="button"
-                    onClick={() => setAvatar(item)}
-                    className={`rounded-lg border p-2 text-xl transition-colors ${
-                      avatar === item
-                        ? "bg-amber-400/20 border-amber-400 text-amber-400"
-                        : "bg-white/5 border-white/15 hover:bg-white/10"
-                    }`}
-                    aria-label={`Seleccionar avatar ${item}`}
-                  >
-                    {item}
-                  </button>
-                ))}
-              </div>
             </div>
             <div>
               <label className="text-xs text-gray-600 mb-1.5 block">Nombre del equipo *</label>

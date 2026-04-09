@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { useGame } from "@/context/GameContext";
 import { ROOMS } from "@/data/gameData";
@@ -6,11 +6,21 @@ import { formatDuration, type RankingEntry } from "@/lib/liveRoom";
 import { publishRanking, subscribeRoomRanking } from "@/lib/liveRoomSocket";
 import PlayerAvatar from "@/components/PlayerAvatar";
 import { DEFAULT_TEAM_AVATAR } from "@/lib/avatarUtils";
+import { ACHIEVEMENTS } from "@/lib/achievements";
+import { buildCertificateFileName, buildCertificateSvg } from "@/lib/certificate";
 
 export default function VictoryScreen() {
   const { state, resetGame } = useGame();
   const [ranking, setRanking] = useState<RankingEntry[]>([]);
+  const [teamPhotoDataUrl, setTeamPhotoDataUrl] = useState<string | null>(null);
+  const [cameraActive, setCameraActive] = useState(false);
+  const [cameraBusy, setCameraBusy] = useState(false);
+  const [cameraError, setCameraError] = useState<string | null>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const cameraStreamRef = useRef<MediaStream | null>(null);
   const isSoftTheme = state.visualTheme !== "dark-lux";
+  const supportsCamera = typeof navigator !== "undefined" && Boolean(navigator.mediaDevices?.getUserMedia);
 
   useEffect(() => {
     // Play victory sound
@@ -23,6 +33,12 @@ export default function VictoryScreen() {
     ? Math.floor((state.endTime - state.startTime) / 1000)
     : 0;
   const totalSeconds = elapsed + state.totalPenaltySeconds;
+  const completionDateLabel = new Date(state.endTime || Date.now()).toLocaleDateString("es-ES", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+  const achievementTitles = state.achievementsUnlocked.map((id) => ACHIEVEMENTS[id].title);
 
   const myEntry = useMemo<RankingEntry | null>(() => {
     if (!state.roomCode || !state.startTime || !state.endTime) return null;
@@ -37,6 +53,109 @@ export default function VictoryScreen() {
       totalSeconds,
     };
   }, [state.roomCode, state.startTime, state.endTime, state.playerId, state.teamName, state.teamAvatar, state.roomRole, elapsed, state.totalPenaltySeconds, totalSeconds]);
+
+  const certificateSvg = useMemo(() => {
+    return buildCertificateSvg({
+      teamName: state.teamName || `Jugador-${state.playerId.slice(0, 4)}`,
+      teamMembers: state.teamMembers || "Sin integrantes registrados",
+      roomCode: state.roomCode || "—",
+      durationLabel: formatDuration(totalSeconds),
+      completedAtLabel: completionDateLabel,
+      achievementIds: state.achievementsUnlocked,
+      photoDataUrl: teamPhotoDataUrl,
+    });
+  }, [completionDateLabel, state.achievementsUnlocked, state.playerId, state.roomCode, state.teamMembers, state.teamName, teamPhotoDataUrl, totalSeconds]);
+
+  const certificateFileName = useMemo(
+    () => buildCertificateFileName(state.teamName || `Jugador-${state.playerId.slice(0, 4)}`),
+    [state.playerId, state.teamName],
+  );
+
+  const stopCamera = () => {
+    cameraStreamRef.current?.getTracks().forEach((track) => track.stop());
+    cameraStreamRef.current = null;
+
+    if (videoRef.current) {
+      (videoRef.current as HTMLVideoElement & { srcObject: MediaStream | null }).srcObject = null;
+    }
+
+    setCameraActive(false);
+  };
+
+  const startCamera = async () => {
+    if (!supportsCamera) {
+      setCameraError("Este navegador no soporta la webcam.");
+      return;
+    }
+
+    setCameraBusy(true);
+    setCameraError(null);
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: "user" },
+        audio: false,
+      });
+
+      cameraStreamRef.current = stream;
+      setCameraActive(true);
+    } catch {
+      setCameraError("No pudimos abrir la cámara. Puedes continuar sin foto.");
+    } finally {
+      setCameraBusy(false);
+    }
+  };
+
+  const capturePhoto = () => {
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+
+    if (!video || !canvas || video.videoWidth === 0 || video.videoHeight === 0) {
+      setCameraError("La cámara todavía no está lista.");
+      return;
+    }
+
+    const size = 1200;
+    canvas.width = size;
+    canvas.height = size;
+
+    const side = Math.min(video.videoWidth, video.videoHeight);
+    const offsetX = (video.videoWidth - side) / 2;
+    const offsetY = (video.videoHeight - side) / 2;
+
+    const context = canvas.getContext("2d");
+    if (!context) return;
+
+    context.drawImage(video, offsetX, offsetY, side, side, 0, 0, size, size);
+    setTeamPhotoDataUrl(canvas.toDataURL("image/jpeg", 0.92));
+    stopCamera();
+  };
+
+  const handleDownloadCertificate = () => {
+    const blob = new Blob([certificateSvg], { type: "image/svg+xml;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = certificateFileName;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.setTimeout(() => URL.revokeObjectURL(url), 1500);
+  };
+
+  useEffect(() => {
+    if (!cameraActive || !videoRef.current || !cameraStreamRef.current) return undefined;
+
+    (videoRef.current as HTMLVideoElement & { srcObject: MediaStream | null }).srcObject = cameraStreamRef.current;
+
+    return () => {
+      stopCamera();
+    };
+  }, [cameraActive]);
+
+  useEffect(() => () => {
+    stopCamera();
+  }, []);
 
   useEffect(() => {
     if (!state.roomCode || !myEntry) return;
@@ -118,6 +237,176 @@ export default function VictoryScreen() {
           <div className="bg-white/5 border border-white/10 rounded-2xl p-4">
             <p className="text-3xl font-black text-indigo-400">{formatDuration(totalSeconds)}</p>
             <p className="text-xs text-gray-600 mt-1">Tiempo final</p>
+          </div>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.55 }}
+          className="grid lg:grid-cols-[1.25fr_0.75fr] gap-6 mb-8 text-left"
+        >
+          <div className={`rounded-3xl p-6 border ${isSoftTheme ? "bg-slate-100/80 border-slate-300/40" : "bg-white/5 border-white/10"}`}>
+            <div className="flex flex-wrap items-start justify-between gap-4 mb-5">
+              <div>
+                <p className={`text-xs uppercase tracking-[0.3em] font-bold ${isSoftTheme ? "text-slate-500" : "text-gray-400"}`}>
+                  Certificado automático
+                </p>
+                <h3 className={`text-2xl font-black mt-1 ${isSoftTheme ? "text-slate-900" : "text-white"}`}>
+                  Reconocimiento final para {state.teamName || "tu equipo"}
+                </h3>
+                <p className={`text-sm mt-2 ${isSoftTheme ? "text-slate-600" : "text-gray-300"}`}>
+                  Se genera con el tiempo real, las claves obtenidas y los logros desbloqueados.
+                </p>
+              </div>
+
+              <button
+                onClick={handleDownloadCertificate}
+                className="rounded-2xl bg-amber-400 px-5 py-3 font-black text-black transition-all hover:brightness-110 shadow-lg shadow-amber-400/20"
+              >
+                Descargar certificado
+              </button>
+            </div>
+
+            <div className={`rounded-[28px] p-5 border ${isSoftTheme ? "bg-white border-slate-200" : "bg-slate-950/70 border-white/10"} shadow-2xl shadow-black/20`}>
+              <div className="flex items-start justify-between gap-4 mb-5">
+                <div>
+                  <p className="text-xs uppercase tracking-[0.35em] text-amber-400 font-bold">La Biblioteca del Tiempo</p>
+                  <p className={`text-sm mt-2 ${isSoftTheme ? "text-slate-500" : "text-gray-400"}`}>
+                    Certificado emitido el {completionDateLabel}
+                  </p>
+                </div>
+                <div className="rounded-full border border-amber-400/25 bg-amber-400/10 px-4 py-2 text-xs font-bold text-amber-300">
+                  {state.achievementsUnlocked.length}/{Object.keys(ACHIEVEMENTS).length} logros
+                </div>
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-[0.8fr_1.2fr]">
+                <div className={`rounded-3xl p-4 ${isSoftTheme ? "bg-slate-50" : "bg-white/5"} border ${isSoftTheme ? "border-slate-200" : "border-white/10"}`}>
+                  <div className="mx-auto flex h-36 w-36 items-center justify-center overflow-hidden rounded-full border-4 border-amber-400/40 bg-slate-950 shadow-lg shadow-amber-400/10">
+                    {teamPhotoDataUrl ? (
+                      <img src={teamPhotoDataUrl} alt="Foto de equipo capturada" className="h-full w-full object-cover" />
+                    ) : (
+                      <PlayerAvatar
+                        avatar={state.teamAvatar || DEFAULT_TEAM_AVATAR}
+                        alt={`Avatar de ${state.teamName || "equipo"}`}
+                        className="h-full w-full"
+                        emojiClassName="text-6xl"
+                      />
+                    )}
+                  </div>
+
+                  <div className="mt-4 text-center">
+                    <p className={`text-lg font-black ${isSoftTheme ? "text-slate-900" : "text-white"}`}>
+                      {state.teamName || "Equipo explorador"}
+                    </p>
+                    <p className={`text-xs mt-1 ${isSoftTheme ? "text-slate-500" : "text-gray-400"}`}>
+                      Foto opcional para el cierre final
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div className={`rounded-2xl p-4 ${isSoftTheme ? "bg-slate-50" : "bg-white/5"} border ${isSoftTheme ? "border-slate-200" : "border-white/10"}`}>
+                    <p className={`text-xs uppercase tracking-widest ${isSoftTheme ? "text-slate-500" : "text-gray-400"}`}>Tiempo final</p>
+                    <p className={`text-2xl font-black mt-2 ${isSoftTheme ? "text-slate-900" : "text-white"}`}>{formatDuration(totalSeconds)}</p>
+                  </div>
+                  <div className={`rounded-2xl p-4 ${isSoftTheme ? "bg-slate-50" : "bg-white/5"} border ${isSoftTheme ? "border-slate-200" : "border-white/10"}`}>
+                    <p className={`text-xs uppercase tracking-widest ${isSoftTheme ? "text-slate-500" : "text-gray-400"}`}>Claves</p>
+                    <p className={`text-2xl font-black mt-2 ${isSoftTheme ? "text-slate-900" : "text-white"}`}>{state.keysCollected.length}/4</p>
+                  </div>
+                  <div className={`rounded-2xl p-4 ${isSoftTheme ? "bg-slate-50" : "bg-white/5"} border ${isSoftTheme ? "border-slate-200" : "border-white/10"}`}>
+                    <p className={`text-xs uppercase tracking-widest ${isSoftTheme ? "text-slate-500" : "text-gray-400"}`}>Logros</p>
+                    <p className={`text-2xl font-black mt-2 ${isSoftTheme ? "text-slate-900" : "text-white"}`}>{state.achievementsUnlocked.length}</p>
+                  </div>
+                  <div className={`rounded-2xl p-4 ${isSoftTheme ? "bg-slate-50" : "bg-white/5"} border ${isSoftTheme ? "border-slate-200" : "border-white/10"}`}>
+                    <p className={`text-xs uppercase tracking-widest ${isSoftTheme ? "text-slate-500" : "text-gray-400"}`}>Sala</p>
+                    <p className={`text-2xl font-black mt-2 ${isSoftTheme ? "text-slate-900" : "text-white"}`}>{state.roomCode || "—"}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className={`mt-5 rounded-3xl p-4 ${isSoftTheme ? "bg-slate-50" : "bg-white/5"} border ${isSoftTheme ? "border-slate-200" : "border-white/10"}`}>
+                <p className={`text-xs uppercase tracking-widest mb-3 ${isSoftTheme ? "text-slate-500" : "text-gray-400"}`}>Logros visibles</p>
+                <div className="flex flex-wrap gap-2">
+                  {achievementTitles.length > 0 ? achievementTitles.map((title) => (
+                    <span key={title} className="rounded-full border border-amber-400/25 bg-amber-400/10 px-3 py-1 text-xs font-semibold text-amber-300">
+                      {title}
+                    </span>
+                  )) : (
+                    <span className={`text-sm ${isSoftTheme ? "text-slate-500" : "text-gray-400"}`}>Aún no hay logros desbloqueados.</span>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className={`rounded-3xl p-6 border ${isSoftTheme ? "bg-slate-100/80 border-slate-300/40" : "bg-white/5 border-white/10"}`}>
+            <div className="flex items-start justify-between gap-4 mb-5">
+              <div>
+                <p className={`text-xs uppercase tracking-[0.3em] font-bold ${isSoftTheme ? "text-slate-500" : "text-gray-400"}`}>
+                  Foto de equipo opcional
+                </p>
+                <h3 className={`text-xl font-black mt-1 ${isSoftTheme ? "text-slate-900" : "text-white"}`}>
+                  Usa webcam para el cierre
+                </h3>
+                <p className={`text-sm mt-2 ${isSoftTheme ? "text-slate-600" : "text-gray-300"}`}>
+                  Si el navegador lo permite, puedes tomar una foto y meterla en el certificado.
+                </p>
+              </div>
+              <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold text-gray-300">
+                Opcional
+              </span>
+            </div>
+
+            <div className="overflow-hidden rounded-[28px] border border-white/10 bg-slate-950/80 shadow-2xl shadow-black/20">
+              <div className="relative aspect-square">
+                {teamPhotoDataUrl ? (
+                  <img src={teamPhotoDataUrl} alt="Foto de equipo tomada" className="h-full w-full object-cover" />
+                ) : cameraActive ? (
+                  <video ref={videoRef} autoPlay muted playsInline className="h-full w-full object-cover" />
+                ) : (
+                  <div className="flex h-full w-full flex-col items-center justify-center px-6 text-center">
+                    <div className="mb-4 text-6xl">📸</div>
+                    <p className="text-lg font-black text-white">Captura un recuerdo final</p>
+                    <p className="mt-2 text-sm text-gray-300">
+                      La foto no es obligatoria. Si no la usan, el certificado toma el avatar del equipo.
+                    </p>
+                    {cameraError && (
+                      <p className="mt-4 rounded-2xl border border-rose-400/30 bg-rose-400/10 px-4 py-3 text-sm text-rose-200">
+                        {cameraError}
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              <canvas ref={canvasRef} className="hidden" />
+            </div>
+
+            <div className="mt-4 grid grid-cols-2 gap-3">
+              <button
+                onClick={cameraActive ? capturePhoto : startCamera}
+                disabled={cameraBusy}
+                className="rounded-2xl bg-amber-400 px-4 py-3 text-sm font-black text-black transition-all hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {cameraBusy ? "Abriendo cámara..." : cameraActive ? "Tomar foto" : (supportsCamera ? "Activar webcam" : "Webcam no disponible")}
+              </button>
+              <button
+                onClick={() => {
+                  setTeamPhotoDataUrl(null);
+                  setCameraError(null);
+                  stopCamera();
+                }}
+                className="rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-sm font-medium text-gray-300 transition-all hover:bg-white/10"
+              >
+                Quitar foto
+              </button>
+            </div>
+
+            <p className={`mt-3 text-xs ${isSoftTheme ? "text-slate-500" : "text-gray-500"}`}>
+              La webcam solo se activa cuando la pides. Si no hay permiso, el juego sigue igual.
+            </p>
           </div>
         </motion.div>
 
@@ -322,6 +611,49 @@ export default function VictoryScreen() {
               {state.keysCollected.join(" + ")}
             </span>
           </p>
+        </motion.div>
+
+        {/* Achievements */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.7 }}
+          className="bg-white/5 border border-white/10 rounded-2xl p-6 mb-8"
+        >
+          <div className="flex items-center justify-between gap-3 mb-4">
+            <div>
+              <h3 className="text-xs text-gray-600 uppercase tracking-widest mb-1">Logros desbloqueados</h3>
+              <p className="text-sm text-gray-300">Tu progreso deja medallas visibles al final.</p>
+            </div>
+            <span className="rounded-full border border-amber-400/30 bg-amber-400/10 px-3 py-1 text-xs font-bold text-amber-300">
+              {state.achievementsUnlocked.length}/{Object.keys(ACHIEVEMENTS).length}
+            </span>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-3">
+              {state.achievementsUnlocked.length === 0 ? (
+              <p className="text-sm text-gray-500">Aún no hay logros desbloqueados.</p>
+            ) : (
+              state.achievementsUnlocked.map((id, index) => {
+                const achievement = ACHIEVEMENTS[id];
+                return (
+                  <motion.div
+                    key={id}
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.75 + index * 0.05 }}
+                    className="rounded-xl border border-amber-400/25 bg-amber-400/10 p-4 flex items-start gap-3"
+                  >
+                    <div className="text-2xl">{achievement.icon}</div>
+                    <div>
+                      <p className="font-bold text-white text-sm">{achievement.title}</p>
+                      <p className="text-xs text-amber-100/80 mt-1">{achievement.description}</p>
+                    </div>
+                  </motion.div>
+                );
+              })
+            )}
+          </div>
         </motion.div>
 
         {/* Levels mastered */}

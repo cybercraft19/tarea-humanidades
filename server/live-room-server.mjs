@@ -35,6 +35,19 @@ function getChat(roomCode) {
   return room.chat || [];
 }
 
+function hasMeaningfulPlayerChange(previous = {}, next = {}) {
+  return (
+    previous.displayName !== next.displayName ||
+    previous.teamName !== next.teamName ||
+    previous.teamAvatar !== next.teamAvatar ||
+    previous.lobbyReady !== next.lobbyReady ||
+    previous.role !== next.role ||
+    previous.currentScreen !== next.currentScreen ||
+    previous.currentRoom !== next.currentRoom ||
+    previous.keysCollectedCount !== next.keysCollectedCount
+  );
+}
+
 function send(socket, payload) {
   if (socket.readyState === socket.OPEN) {
     socket.send(JSON.stringify(payload));
@@ -128,13 +141,16 @@ wss.on("connection", (socket) => {
     if (data.type === "heartbeat") {
       const room = ensureRoom(socket.roomCode);
       const current = room.players.get(socket.playerId) || {};
-      room.players.set(socket.playerId, {
+      const nextPlayer = {
         ...current,
         ...data.player,
         playerId: socket.playerId,
         lastSeen: Date.now(),
-      });
-      broadcastSnapshot(socket.roomCode);
+      };
+      room.players.set(socket.playerId, nextPlayer);
+      if (hasMeaningfulPlayerChange(current, nextPlayer)) {
+        broadcastSnapshot(socket.roomCode);
+      }
       return;
     }
 

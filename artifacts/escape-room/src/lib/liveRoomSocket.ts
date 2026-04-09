@@ -28,6 +28,7 @@ type SessionStartMessage = {
   initiatedBy: string;
 };
 
+
 type ErrorMessage = {
   type: "error";
   message: string;

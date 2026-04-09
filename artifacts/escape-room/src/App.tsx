@@ -61,7 +61,7 @@ function LivePresenceBridge() {
     };
 
     publish();
-    const intervalId = window.setInterval(publish, 2000);
+    const intervalId = window.setInterval(publish, 5000);
 
     const onBeforeUnload = () => {
       disconnectLiveRoom();

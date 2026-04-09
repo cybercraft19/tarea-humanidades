@@ -5,12 +5,19 @@ import { useGame } from "@/context/GameContext";
 import { type LiveChatMessage, type LivePlayer } from "@/lib/liveRoom";
 import { requestSessionStart, sendLiveChatMessage, subscribeLiveChat, subscribeLivePlayers, subscribeSessionStart } from "@/lib/liveRoomSocket";
 import PlayerAvatar from "@/components/PlayerAvatar";
-import { createAvatarFromFile, createCartoonAvatar, DEFAULT_TEAM_AVATAR } from "@/lib/avatarUtils";
+import ManualAvatarBuilder from "@/components/ManualAvatarBuilder";
+import {
+  createCartoonAvatar,
+  createDefaultManualAvatarProfile,
+  createAvatarFromFile,
+  createManualAvatar,
+  DEFAULT_TEAM_AVATAR,
+} from "@/lib/avatarUtils";
 
 type LobbyMode = "create" | "join";
 type LobbySection = "profile" | "room" | "team";
+type AvatarProfileMode = "builder" | "quick";
 const ROOM_CODE_LENGTH = 6;
-const AVATARS = ["🦉", "🦊", "🐺", "🐯", "🐙", "🦁", "🐼", "🐉"];
 
 function generateRoomCode() {
   return Math.random().toString(36).slice(2, 2 + ROOM_CODE_LENGTH).toUpperCase();
@@ -26,6 +33,9 @@ export default function LobbyScreen() {
   const [joinCode, setJoinCode] = useState(state.roomRole === "guest" ? state.roomCode : "");
   const [profileName, setProfileName] = useState(state.teamName);
   const [profileAvatar, setProfileAvatar] = useState(state.teamAvatar || DEFAULT_TEAM_AVATAR);
+  const [manualAvatar, setManualAvatar] = useState(createDefaultManualAvatarProfile(state.teamName || ""));
+  const [avatarProfileMode, setAvatarProfileMode] = useState<AvatarProfileMode>("quick");
+  const [isAvatarBuilderOpen, setIsAvatarBuilderOpen] = useState(false);
   const [isAvatarLoading, setIsAvatarLoading] = useState(false);
   const [activeRoomCode, setActiveRoomCode] = useState(state.roomCode);
   const [error, setError] = useState("");
@@ -275,6 +285,26 @@ export default function LobbyScreen() {
     }
   };
 
+  const applyManualAvatar = () => {
+    setProfileAvatar(createManualAvatar(manualAvatar));
+  };
+
+  const applyManualAvatarAndClose = () => {
+    applyManualAvatar();
+    setIsAvatarBuilderOpen(false);
+    setFeedback("Avatar manual aplicado.");
+  };
+
+  const applyRandomAvatar = () => {
+    setProfileAvatar(
+      createCartoonAvatar({
+        style: "avataaars",
+        seed: `${profileName.trim() || "jugador"}-${Date.now().toString(36)}`,
+      }),
+    );
+    setFeedback("Avatar aleatorio aplicado.");
+  };
+
   return (
     <div className={`min-h-screen relative overflow-hidden ${isSoftTheme ? "text-slate-900" : "text-white"} px-4 py-8 flex items-center justify-center`}>
       <video autoPlay loop muted playsInline className="absolute inset-0 h-full w-full object-cover opacity-16 saturate-[0.8]">
@@ -379,6 +409,37 @@ export default function LobbyScreen() {
               </div>
               <div>
                 <label className="text-xs text-slate-300 block mb-1.5">Avatar</label>
+                <div className="mb-3 grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAvatarProfileMode("builder");
+                      setIsAvatarBuilderOpen(true);
+                    }}
+                    className={`rounded-lg px-3 py-2 text-xs font-bold transition-colors ${
+                      isAvatarBuilderOpen || avatarProfileMode === "builder"
+                        ? "bg-cyan-400 text-black"
+                        : "bg-white/10 border border-white/20 text-white hover:bg-white/15"
+                    }`}
+                  >
+                    Crear avatar
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAvatarProfileMode("quick");
+                      setIsAvatarBuilderOpen(false);
+                    }}
+                    className={`rounded-lg px-3 py-2 text-xs font-bold transition-colors ${
+                      avatarProfileMode === "quick"
+                        ? "bg-amber-400 text-black"
+                        : "bg-white/10 border border-white/20 text-white hover:bg-white/15"
+                    }`}
+                  >
+                    Rapido o foto
+                  </button>
+                </div>
+
                 <div className="mb-3 flex items-center gap-3 rounded-xl border border-white/15 bg-white/5 p-3">
                   <PlayerAvatar
                     avatar={profileAvatar}
@@ -387,14 +448,24 @@ export default function LobbyScreen() {
                     emojiClassName="text-2xl"
                   />
                   <div className="flex-1">
-                    <p className="text-xs text-slate-300">Elige emoji, genera caricatura o sube una foto.</p>
-                    <div className="mt-2 flex flex-wrap gap-2">
+                    <p className="text-xs text-slate-300">
+                      {avatarProfileMode === "builder"
+                        ? "Seccion crear avatar: ajusta rasgos para que se parezca a ti."
+                        : "Modo rapido: avatar al azar o foto de tu preferencia."}
+                    </p>
+                  </div>
+                </div>
+
+                {avatarProfileMode === "quick" && (
+                  <div className="mt-3 rounded-xl border border-white/15 bg-black/20 p-3 space-y-2">
+                    <p className="text-[11px] uppercase tracking-widest text-slate-300">Modo rapido</p>
+                    <div className="flex flex-wrap gap-2">
                       <button
                         type="button"
-                        onClick={() => setProfileAvatar(createCartoonAvatar())}
+                        onClick={applyRandomAvatar}
                         className="rounded-lg border border-cyan-300/35 bg-cyan-400/10 px-3 py-1.5 text-[11px] font-bold text-cyan-100"
                       >
-                        Generar caricatura
+                        Poner avatar al azar
                       </button>
                       <button
                         type="button"
@@ -412,7 +483,68 @@ export default function LobbyScreen() {
                       </button>
                     </div>
                   </div>
-                </div>
+                )}
+
+                {isAvatarBuilderOpen && (
+                  <div className="fixed inset-0 z-40 bg-black/80 backdrop-blur-sm p-4 md:p-8">
+                    <div className="mx-auto h-full w-full max-w-5xl rounded-2xl border border-white/15 bg-slate-950/95 p-4 md:p-6 overflow-y-auto">
+                      <div className="mb-4 flex items-center justify-between gap-3">
+                        <div>
+                          <p className="text-[11px] uppercase tracking-widest text-cyan-300">Creador de avatar</p>
+                          <h3 className="text-xl md:text-2xl font-black text-white">Editor en pantalla completa</h3>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIsAvatarBuilderOpen(false);
+                            setAvatarProfileMode("quick");
+                          }}
+                          className="rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-xs font-bold text-white hover:bg-white/15"
+                        >
+                          Volver
+                        </button>
+                      </div>
+
+                      <div className="rounded-xl border border-white/15 bg-white/5 p-3 flex items-center gap-3 mb-3">
+                        <PlayerAvatar
+                          avatar={profileAvatar}
+                          alt="Vista previa avatar"
+                          className="h-16 w-16"
+                          emojiClassName="text-3xl"
+                        />
+                        <p className="text-xs text-slate-300">
+                          Ajusta rasgos, aplica y vuelve al perfil cuando te quede parecido a ti.
+                        </p>
+                      </div>
+
+                      <ManualAvatarBuilder
+                        profile={manualAvatar}
+                        onProfileChange={setManualAvatar}
+                        onApply={applyManualAvatar}
+                      />
+
+                      <div className="mt-4 flex flex-wrap gap-2">
+                        <button
+                          type="button"
+                          onClick={applyManualAvatarAndClose}
+                          className="rounded-lg bg-cyan-400 text-black px-4 py-2 text-xs md:text-sm font-extrabold transition-colors hover:bg-cyan-300"
+                        >
+                          Aplicar y volver al perfil
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIsAvatarBuilderOpen(false);
+                            setAvatarProfileMode("quick");
+                          }}
+                          className="rounded-lg border border-white/20 bg-white/10 px-4 py-2 text-xs md:text-sm font-bold text-white hover:bg-white/15"
+                        >
+                          Cancelar
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
                 <input
                   ref={galleryInputRef}
                   type="file"
@@ -437,23 +569,6 @@ export default function LobbyScreen() {
                   }}
                 />
                 {isAvatarLoading && <p className="mb-2 text-[11px] text-amber-300">Procesando imagen...</p>}
-                <div className="grid grid-cols-4 sm:grid-cols-8 gap-2">
-                  {AVATARS.map((item) => (
-                    <button
-                      key={item}
-                      type="button"
-                      onClick={() => setProfileAvatar(item)}
-                      className={`rounded-lg border p-2 text-xl transition-colors ${
-                        profileAvatar === item
-                          ? "bg-amber-400/15 border-amber-400 text-amber-300"
-                          : "bg-white/5 border-white/15 hover:bg-white/10"
-                      }`}
-                      aria-label={`Seleccionar avatar ${item}`}
-                    >
-                      {item}
-                    </button>
-                  ))}
-                </div>
               </div>
               <div className="flex gap-2">
                 <button
