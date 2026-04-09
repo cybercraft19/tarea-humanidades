@@ -28,13 +28,25 @@ type SessionStartMessage = {
   initiatedBy: string;
 };
 
+type ConnectedMessage = {
+  type: "connected";
+  serverTime: number;
+};
+
 
 type ErrorMessage = {
   type: "error";
   message: string;
 };
 
-type IncomingMessage = RoomSnapshotMessage | RankingMessage | ChatHistoryMessage | ChatMessage | SessionStartMessage | ErrorMessage;
+type IncomingMessage =
+  | RoomSnapshotMessage
+  | RankingMessage
+  | ChatHistoryMessage
+  | ChatMessage
+  | SessionStartMessage
+  | ConnectedMessage
+  | ErrorMessage;
 
 type PresenceListener = (players: LivePlayer[]) => void;
 type RankingListener = (ranking: RankingEntry[]) => void;
@@ -51,6 +63,7 @@ class LiveRoomSocketClient {
   private players: LivePlayer[] = [];
   private ranking: RankingEntry[] = [];
   private chatMessages: LiveChatMessage[] = [];
+  private serverClockOffsetMs = 0;
   private sessionStartListeners = new Set<SessionStartListener>();
   private chatListeners = new Set<ChatListener>();
   private presenceListeners = new Set<PresenceListener>();
@@ -131,6 +144,7 @@ class LiveRoomSocketClient {
 
     this.players = [];
     this.ranking = [];
+    this.serverClockOffsetMs = 0;
     this.notifyPlayers();
     this.notifyRanking();
   }
@@ -150,8 +164,8 @@ class LiveRoomSocketClient {
     this.send({ type: "chat", text: trimmed.slice(0, 280) });
   }
 
-  requestSessionStart(startAt: number) {
-    this.send({ type: "start-session", startAt });
+  requestSessionStart(delayMs = 4000) {
+    this.send({ type: "start-session", delayMs });
   }
 
   subscribePresence(listener: PresenceListener) {
@@ -235,6 +249,12 @@ class LiveRoomSocketClient {
 
     const message = parsed as IncomingMessage;
 
+    if (message.type === "connected") {
+      // Convert future server timestamps into local timestamps.
+      this.serverClockOffsetMs = Date.now() - message.serverTime;
+      return;
+    }
+
     if (message.type === "snapshot") {
       this.players = message.players || [];
       this.ranking = message.ranking || [];
@@ -262,7 +282,8 @@ class LiveRoomSocketClient {
     }
 
     if (message.type === "session-start") {
-      this.notifySessionStart({ startAt: message.startAt, initiatedBy: message.initiatedBy });
+      const correctedStartAt = message.startAt + this.serverClockOffsetMs;
+      this.notifySessionStart({ startAt: correctedStartAt, initiatedBy: message.initiatedBy });
       return;
     }
 
@@ -299,8 +320,8 @@ export function sendLiveChatMessage(text: string) {
   client.sendChat(text);
 }
 
-export function requestSessionStart(startAt: number) {
-  client.requestSessionStart(startAt);
+export function requestSessionStart(delayMs?: number) {
+  client.requestSessionStart(delayMs);
 }
 
 export function subscribeLivePlayers(listener: PresenceListener) {

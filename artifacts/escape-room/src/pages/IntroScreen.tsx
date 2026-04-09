@@ -1,13 +1,8 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { useGame } from "@/context/GameContext";
 import { GAME_INTRO } from "@/data/gameData";
-import PlayerAvatar from "@/components/PlayerAvatar";
-import ManualAvatarBuilder from "@/components/ManualAvatarBuilder";
 import {
-  createDefaultManualAvatarProfile,
-  createAvatarFromFile,
-  createManualAvatar,
   DEFAULT_TEAM_AVATAR,
 } from "@/lib/avatarUtils";
 
@@ -16,13 +11,8 @@ export default function IntroScreen() {
   const isSoftTheme = state.visualTheme !== "dark-lux";
   const [name, setName] = useState(state.teamName);
   const [members, setMembers] = useState(state.teamMembers);
-  const [avatar, setAvatar] = useState(state.teamAvatar || DEFAULT_TEAM_AVATAR);
-  const [manualAvatar, setManualAvatar] = useState(createDefaultManualAvatarProfile(state.teamName || ""));
-  const [isAvatarLoading, setIsAvatarLoading] = useState(false);
   const [error, setError] = useState("");
   const [isNarrating, setIsNarrating] = useState(false);
-  const galleryInputRef = useRef<HTMLInputElement | null>(null);
-  const cameraInputRef = useRef<HTMLInputElement | null>(null);
 
   const narrationText = useMemo(
     () => `${GAME_INTRO.title}. ${GAME_INTRO.subtitle}. ${GAME_INTRO.description}`,
@@ -66,27 +56,8 @@ export default function IntroScreen() {
       return;
     }
 
-    setTeamInfo(name.trim(), members.trim(), avatar || DEFAULT_TEAM_AVATAR);
+    setTeamInfo(name.trim(), members.trim(), state.teamAvatar || DEFAULT_TEAM_AVATAR);
     startGame();
-  };
-
-  const handleAvatarFile = async (file?: File | null) => {
-    if (!file) return;
-
-    setIsAvatarLoading(true);
-    try {
-      const nextAvatar = await createAvatarFromFile(file);
-      setAvatar(nextAvatar);
-      setError("");
-    } catch {
-      setError("No se pudo procesar la imagen. Intenta con otra foto.");
-    } finally {
-      setIsAvatarLoading(false);
-    }
-  };
-
-  const applyManualAvatar = () => {
-    setAvatar(createManualAvatar(manualAvatar));
   };
 
   return (
@@ -192,67 +163,6 @@ export default function IntroScreen() {
           <h3 className="text-sm font-semibold text-gray-300 mb-4">Identificación del equipo</h3>
           <div className="space-y-4">
             <div>
-              <label className="text-xs text-gray-600 mb-2 block">Avatar del equipo</label>
-              <div className="mb-3 flex items-center gap-3 rounded-xl border border-white/15 bg-white/5 p-3">
-                <PlayerAvatar
-                  avatar={avatar}
-                  alt="Avatar del equipo"
-                  className="h-14 w-14"
-                  emojiClassName="text-2xl"
-                />
-                <div className="flex-1">
-                  <p className="text-xs text-gray-300">
-                    Personaliza tu avatar con rasgos manuales o usa foto de galeria/camara.
-                  </p>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    <button
-                      type="button"
-                      onClick={() => galleryInputRef.current?.click()}
-                      className="rounded-lg border border-white/20 bg-white/10 px-3 py-1.5 text-[11px] font-bold text-white"
-                    >
-                      Subir foto
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => cameraInputRef.current?.click()}
-                      className="rounded-lg border border-amber-300/35 bg-amber-300/10 px-3 py-1.5 text-[11px] font-bold text-amber-300"
-                    >
-                      Usar camara
-                    </button>
-                  </div>
-                </div>
-              </div>
-              <ManualAvatarBuilder
-                profile={manualAvatar}
-                onProfileChange={setManualAvatar}
-                onApply={applyManualAvatar}
-              />
-              <input
-                ref={galleryInputRef}
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  void handleAvatarFile(file);
-                  e.target.value = "";
-                }}
-              />
-              <input
-                ref={cameraInputRef}
-                type="file"
-                accept="image/*"
-                capture="environment"
-                className="hidden"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  void handleAvatarFile(file);
-                  e.target.value = "";
-                }}
-              />
-              {isAvatarLoading && <p className="mt-2 text-[11px] text-amber-300">Procesando imagen...</p>}
-            </div>
-            <div>
               <label className="text-xs text-gray-600 mb-1.5 block">Nombre del equipo *</label>
               <input
                 type="text"
@@ -275,6 +185,7 @@ export default function IntroScreen() {
                 className="w-full rounded-xl px-4 py-3 text-white placeholder-gray-500 text-sm transition-colors resize-none bg-white/10 border border-white/20 focus:outline-none focus:border-amber-400/70"
               />
             </div>
+
             {error && <p className="text-rose-400 text-xs">{error}</p>}
             <button
               onClick={handleStart}

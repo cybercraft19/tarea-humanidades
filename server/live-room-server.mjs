@@ -190,8 +190,16 @@ wss.on("connection", (socket) => {
         return;
       }
 
-      const requested = Number(data.startAt);
-      const startAt = Number.isFinite(requested) ? Math.max(Date.now() + 500, requested) : Date.now() + 3000;
+      const requestedDelay = Number(data.delayMs);
+      const requestedStartAt = Number(data.startAt);
+
+      const delayMs = Number.isFinite(requestedDelay)
+        ? Math.min(Math.max(requestedDelay, 500), 10000)
+        : Number.isFinite(requestedStartAt)
+          ? Math.min(Math.max(requestedStartAt - Date.now(), 500), 10000)
+          : 4000;
+
+      const startAt = Date.now() + delayMs;
       broadcastToRoom(socket.roomCode, {
         type: "session-start",
         startAt,

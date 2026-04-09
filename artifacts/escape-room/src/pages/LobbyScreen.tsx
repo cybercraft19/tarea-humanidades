@@ -248,9 +248,7 @@ export default function LobbyScreen() {
       return;
     }
 
-    const startAt = Date.now() + 4000;
-    setPendingStartAt(startAt);
-    requestSessionStart(startAt);
+    requestSessionStart(4000);
     setFeedback("Cuenta regresiva iniciada para todos.");
     setError("");
   };
