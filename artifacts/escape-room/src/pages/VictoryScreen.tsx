@@ -4,6 +4,8 @@ import { useGame } from "@/context/GameContext";
 import { ROOMS } from "@/data/gameData";
 import { formatDuration, type RankingEntry } from "@/lib/liveRoom";
 import { publishRanking, subscribeRoomRanking } from "@/lib/liveRoomSocket";
+import PlayerAvatar from "@/components/PlayerAvatar";
+import { DEFAULT_TEAM_AVATAR } from "@/lib/avatarUtils";
 
 export default function VictoryScreen() {
   const { state, resetGame } = useGame();
@@ -84,9 +86,17 @@ export default function VictoryScreen() {
             Has liberado el conocimiento de la Biblioteca del Tiempo
           </p>
           {state.teamName && (
-            <p className="text-gray-600 text-sm">
-              Equipo: <span className="text-white font-medium">{state.teamAvatar} {state.teamName}</span>
-            </p>
+            <div className="mt-2 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1.5">
+              <PlayerAvatar
+                avatar={state.teamAvatar || DEFAULT_TEAM_AVATAR}
+                alt={`Avatar de ${state.teamName}`}
+                className="h-6 w-6"
+                emojiClassName="text-sm"
+              />
+              <p className="text-gray-300 text-sm">
+                Equipo: <span className="text-white font-medium">{state.teamName}</span>
+              </p>
+            </div>
           )}
         </motion.div>
 
@@ -156,7 +166,15 @@ export default function VictoryScreen() {
                       >
                         <p className="text-3xl mb-2">🥈</p>
                         <p className={`font-bold text-sm ${isSoftTheme ? "text-slate-900" : "text-white"}`}>
-                          {ranking[1].teamAvatar} {ranking[1].teamName}
+                          <span className="inline-flex items-center gap-1.5">
+                            <PlayerAvatar
+                              avatar={ranking[1].teamAvatar || DEFAULT_TEAM_AVATAR}
+                              alt={`Avatar de ${ranking[1].teamName}`}
+                              className="h-5 w-5"
+                              emojiClassName="text-[11px]"
+                            />
+                            {ranking[1].teamName}
+                          </span>
                         </p>
                         <p className={`text-xs ${isSoftTheme ? "text-slate-600" : "text-gray-600"} mt-1`}>
                           {formatDuration(ranking[1].totalSeconds)}
@@ -185,7 +203,15 @@ export default function VictoryScreen() {
                           🥇
                         </motion.p>
                         <p className={`font-black text-lg ${isSoftTheme ? "text-amber-900" : "text-amber-700"}`}>
-                          {ranking[0].teamAvatar} {ranking[0].teamName}
+                          <span className="inline-flex items-center gap-1.5">
+                            <PlayerAvatar
+                              avatar={ranking[0].teamAvatar || DEFAULT_TEAM_AVATAR}
+                              alt={`Avatar de ${ranking[0].teamName}`}
+                              className="h-6 w-6"
+                              emojiClassName="text-xs"
+                            />
+                            {ranking[0].teamName}
+                          </span>
                         </p>
                         <p className={`text-sm font-bold mt-1 ${isSoftTheme ? "text-amber-600" : "text-amber-300"}`}>
                           {formatDuration(ranking[0].totalSeconds)}
@@ -211,7 +237,15 @@ export default function VictoryScreen() {
                       >
                         <p className="text-3xl mb-2">🥉</p>
                         <p className={`font-bold text-sm ${isSoftTheme ? "text-slate-900" : "text-white"}`}>
-                          {ranking[2].teamAvatar} {ranking[2].teamName}
+                          <span className="inline-flex items-center gap-1.5">
+                            <PlayerAvatar
+                              avatar={ranking[2].teamAvatar || DEFAULT_TEAM_AVATAR}
+                              alt={`Avatar de ${ranking[2].teamName}`}
+                              className="h-5 w-5"
+                              emojiClassName="text-[11px]"
+                            />
+                            {ranking[2].teamName}
+                          </span>
                         </p>
                         <p className={`text-xs ${isSoftTheme ? "text-slate-600" : "text-gray-600"} mt-1`}>
                           {formatDuration(ranking[2].totalSeconds)}
@@ -237,7 +271,16 @@ export default function VictoryScreen() {
                         }`}>
                           <div>
                             <p className={`text-sm font-semibold ${isSoftTheme ? "text-slate-900" : "text-white"}`}>
-                              #{index + 4} {entry.teamAvatar || "🦉"} {entry.teamName}
+                              <span className="inline-flex items-center gap-1.5">
+                                <span>#{index + 4}</span>
+                                <PlayerAvatar
+                                  avatar={entry.teamAvatar || DEFAULT_TEAM_AVATAR}
+                                  alt={`Avatar de ${entry.teamName}`}
+                                  className="h-5 w-5"
+                                  emojiClassName="text-[11px]"
+                                />
+                                {entry.teamName}
+                              </span>
                             </p>
                           </div>
                           <span className={`font-mono text-sm font-bold ${isSoftTheme ? "text-amber-600" : "text-amber-300"}`}>

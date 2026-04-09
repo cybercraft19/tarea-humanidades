@@ -1,7 +1,9 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { useGame } from "@/context/GameContext";
 import { GAME_INTRO } from "@/data/gameData";
+import PlayerAvatar from "@/components/PlayerAvatar";
+import { createAvatarFromFile, createCartoonAvatar, DEFAULT_TEAM_AVATAR } from "@/lib/avatarUtils";
 
 const AVATARS = ["🦉", "🦊", "🐺", "🐯", "🐙", "🦁", "🐼", "🐉"];
 
@@ -10,9 +12,12 @@ export default function IntroScreen() {
   const isSoftTheme = state.visualTheme !== "dark-lux";
   const [name, setName] = useState(state.teamName);
   const [members, setMembers] = useState(state.teamMembers);
-  const [avatar, setAvatar] = useState(state.teamAvatar || "🦉");
+  const [avatar, setAvatar] = useState(state.teamAvatar || DEFAULT_TEAM_AVATAR);
+  const [isAvatarLoading, setIsAvatarLoading] = useState(false);
   const [error, setError] = useState("");
   const [isNarrating, setIsNarrating] = useState(false);
+  const galleryInputRef = useRef<HTMLInputElement | null>(null);
+  const cameraInputRef = useRef<HTMLInputElement | null>(null);
 
   const narrationText = useMemo(
     () => `${GAME_INTRO.title}. ${GAME_INTRO.subtitle}. ${GAME_INTRO.description}`,
@@ -56,8 +61,23 @@ export default function IntroScreen() {
       return;
     }
 
-    setTeamInfo(name.trim(), members.trim(), avatar);
+    setTeamInfo(name.trim(), members.trim(), avatar || DEFAULT_TEAM_AVATAR);
     startGame();
+  };
+
+  const handleAvatarFile = async (file?: File | null) => {
+    if (!file) return;
+
+    setIsAvatarLoading(true);
+    try {
+      const nextAvatar = await createAvatarFromFile(file);
+      setAvatar(nextAvatar);
+      setError("");
+    } catch {
+      setError("No se pudo procesar la imagen. Intenta con otra foto.");
+    } finally {
+      setIsAvatarLoading(false);
+    }
   };
 
   return (
@@ -164,6 +184,68 @@ export default function IntroScreen() {
           <div className="space-y-4">
             <div>
               <label className="text-xs text-gray-600 mb-2 block">Avatar del equipo</label>
+              <div className="mb-3 flex items-center gap-3 rounded-xl border border-white/15 bg-white/5 p-3">
+                <PlayerAvatar
+                  avatar={avatar}
+                  alt="Avatar del equipo"
+                  className="h-14 w-14"
+                  emojiClassName="text-2xl"
+                />
+                <div className="flex-1">
+                  <p className="text-xs text-gray-300">
+                    Personaliza tu avatar: caricatura, foto de galeria o camara.
+                  </p>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setAvatar(createCartoonAvatar())}
+                      className="rounded-lg border border-cyan-300/35 bg-cyan-400/10 px-3 py-1.5 text-[11px] font-bold text-cyan-200"
+                    >
+                      Generar caricatura
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => galleryInputRef.current?.click()}
+                      className="rounded-lg border border-white/20 bg-white/10 px-3 py-1.5 text-[11px] font-bold text-white"
+                    >
+                      Subir foto
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => cameraInputRef.current?.click()}
+                      className="rounded-lg border border-amber-300/35 bg-amber-300/10 px-3 py-1.5 text-[11px] font-bold text-amber-300"
+                    >
+                      Usar camara
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <input
+                ref={galleryInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  void handleAvatarFile(file);
+                  e.target.value = "";
+                }}
+              />
+              <input
+                ref={cameraInputRef}
+                type="file"
+                accept="image/*"
+                capture="environment"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  void handleAvatarFile(file);
+                  e.target.value = "";
+                }}
+              />
+              {isAvatarLoading && <p className="mt-2 text-[11px] text-amber-300">Procesando imagen...</p>}
+
+              <p className="mt-3 mb-2 text-[11px] uppercase tracking-widest text-gray-500">O elige un emoji rapido</p>
               <div className="grid grid-cols-4 sm:grid-cols-8 gap-2">
                 {AVATARS.map((item) => (
                   <button
@@ -172,7 +254,7 @@ export default function IntroScreen() {
                     onClick={() => setAvatar(item)}
                     className={`rounded-lg border p-2 text-xl transition-colors ${
                       avatar === item
-                        ? "amber-400/20 border-amber-400 text-amber-400"
+                        ? "bg-amber-400/20 border-amber-400 text-amber-400"
                         : "bg-white/5 border-white/15 hover:bg-white/10"
                     }`}
                     aria-label={`Seleccionar avatar ${item}`}
@@ -210,7 +292,7 @@ export default function IntroScreen() {
               onClick={handleStart}
               className="w-full rounded-xl bg-amber-400 text-black font-bold py-4 transition-all duration-200 text-sm tracking-wide hover:bg-amber-300"
             >
-              Entrar a la Biblioteca del Tiempo {avatar}
+              Entrar a la Biblioteca del Tiempo
             </button>
           </div>
         </motion.div>

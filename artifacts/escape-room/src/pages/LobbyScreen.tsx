@@ -4,6 +4,8 @@ import { Check } from "lucide-react";
 import { useGame } from "@/context/GameContext";
 import { type LiveChatMessage, type LivePlayer } from "@/lib/liveRoom";
 import { requestSessionStart, sendLiveChatMessage, subscribeLiveChat, subscribeLivePlayers, subscribeSessionStart } from "@/lib/liveRoomSocket";
+import PlayerAvatar from "@/components/PlayerAvatar";
+import { createAvatarFromFile, createCartoonAvatar, DEFAULT_TEAM_AVATAR } from "@/lib/avatarUtils";
 
 type LobbyMode = "create" | "join";
 type LobbySection = "profile" | "room" | "team";
@@ -23,7 +25,8 @@ export default function LobbyScreen() {
   const [createdRoomCode, setCreatedRoomCode] = useState(state.roomRole === "host" ? state.roomCode : "");
   const [joinCode, setJoinCode] = useState(state.roomRole === "guest" ? state.roomCode : "");
   const [profileName, setProfileName] = useState(state.teamName);
-  const [profileAvatar, setProfileAvatar] = useState(state.teamAvatar || "🦉");
+  const [profileAvatar, setProfileAvatar] = useState(state.teamAvatar || DEFAULT_TEAM_AVATAR);
+  const [isAvatarLoading, setIsAvatarLoading] = useState(false);
   const [activeRoomCode, setActiveRoomCode] = useState(state.roomCode);
   const [error, setError] = useState("");
   const [feedback, setFeedback] = useState("");
@@ -34,6 +37,8 @@ export default function LobbyScreen() {
   const [chatMessages, setChatMessages] = useState<LiveChatMessage[]>([]);
   const hasAutoStartedRef = useRef(false);
   const chatScrollRef = useRef<HTMLDivElement | null>(null);
+  const galleryInputRef = useRef<HTMLInputElement | null>(null);
+  const cameraInputRef = useRef<HTMLInputElement | null>(null);
 
   const sessionRoleLabel = state.roomRole === "host"
     ? "Anfitrión"
@@ -255,6 +260,21 @@ export default function LobbyScreen() {
     }
   };
 
+  const handleAvatarFile = async (file?: File | null) => {
+    if (!file) return;
+
+    setIsAvatarLoading(true);
+    try {
+      const nextAvatar = await createAvatarFromFile(file);
+      setProfileAvatar(nextAvatar);
+      setError("");
+    } catch {
+      setError("No pudimos procesar la foto. Prueba con otra imagen.");
+    } finally {
+      setIsAvatarLoading(false);
+    }
+  };
+
   return (
     <div className={`min-h-screen relative overflow-hidden ${isSoftTheme ? "text-slate-900" : "text-white"} px-4 py-8 flex items-center justify-center`}>
       <video autoPlay loop muted playsInline className="absolute inset-0 h-full w-full object-cover opacity-16 saturate-[0.8]">
@@ -359,6 +379,64 @@ export default function LobbyScreen() {
               </div>
               <div>
                 <label className="text-xs text-slate-300 block mb-1.5">Avatar</label>
+                <div className="mb-3 flex items-center gap-3 rounded-xl border border-white/15 bg-white/5 p-3">
+                  <PlayerAvatar
+                    avatar={profileAvatar}
+                    alt="Avatar de perfil"
+                    className="h-14 w-14"
+                    emojiClassName="text-2xl"
+                  />
+                  <div className="flex-1">
+                    <p className="text-xs text-slate-300">Elige emoji, genera caricatura o sube una foto.</p>
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setProfileAvatar(createCartoonAvatar())}
+                        className="rounded-lg border border-cyan-300/35 bg-cyan-400/10 px-3 py-1.5 text-[11px] font-bold text-cyan-100"
+                      >
+                        Generar caricatura
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => galleryInputRef.current?.click()}
+                        className="rounded-lg border border-white/20 bg-white/10 px-3 py-1.5 text-[11px] font-bold text-white"
+                      >
+                        Subir foto
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => cameraInputRef.current?.click()}
+                        className="rounded-lg border border-amber-300/35 bg-amber-300/10 px-3 py-1.5 text-[11px] font-bold text-amber-300"
+                      >
+                        Usar camara
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <input
+                  ref={galleryInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    void handleAvatarFile(file);
+                    e.target.value = "";
+                  }}
+                />
+                <input
+                  ref={cameraInputRef}
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    void handleAvatarFile(file);
+                    e.target.value = "";
+                  }}
+                />
+                {isAvatarLoading && <p className="mb-2 text-[11px] text-amber-300">Procesando imagen...</p>}
                 <div className="grid grid-cols-4 sm:grid-cols-8 gap-2">
                   {AVATARS.map((item) => (
                     <button
@@ -516,7 +594,12 @@ export default function LobbyScreen() {
                       {connectedPlayers.map((player) => (
                         <div key={player.playerId} className={`grid grid-cols-[1fr_auto_auto] items-center gap-2 rounded-lg px-3 py-2 ${isSoftTheme ? "bg-slate-900/5" : "bg-white/5"}`}>
                           <div className="flex items-center gap-2 min-w-0">
-                            <span className="text-xl leading-none">{player.teamAvatar || "🦉"}</span>
+                            <PlayerAvatar
+                              avatar={player.teamAvatar || DEFAULT_TEAM_AVATAR}
+                              alt={`Avatar de ${player.teamName || player.displayName}`}
+                              className="h-8 w-8"
+                              emojiClassName="text-base"
+                            />
                             <div className="min-w-0">
                               <p className="text-sm text-white font-medium truncate">{player.teamName || player.displayName}</p>
                               <p className="text-[11px] text-slate-500">
@@ -552,7 +635,15 @@ export default function LobbyScreen() {
                       chatMessages.map((msg) => (
                         <div key={msg.id} className="rounded-lg bg-white/5 px-3 py-2">
                           <div className="flex items-center justify-between gap-2">
-                            <p className="text-xs text-amber-300 truncate">{msg.teamAvatar || "🦉"} {msg.displayName}</p>
+                            <div className="min-w-0 flex items-center gap-2">
+                              <PlayerAvatar
+                                avatar={msg.teamAvatar || DEFAULT_TEAM_AVATAR}
+                                alt={`Avatar de ${msg.displayName}`}
+                                className="h-6 w-6"
+                                emojiClassName="text-xs"
+                              />
+                              <p className="text-xs text-amber-300 truncate">{msg.displayName}</p>
+                            </div>
                             <span className="text-[10px] text-slate-500">{formatChatTime(msg.createdAt)}</span>
                           </div>
                           <p className="text-sm text-slate-200 mt-1 break-words">{msg.text}</p>
